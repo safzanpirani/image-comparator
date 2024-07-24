@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Comparison Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+   .container {
+      max-width: 800px;
+      margin: 40px auto;
+      text-align: center;
+    }
+   .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+   .image-container img {
+      width: 50%;
+      height: auto;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Image Comparison Tool</h1>
+    <form id="image-form">
+      <input type="file" id="image-1" accept="image/*">
+      <input type="file" id="image-2" accept="image/*">
+      <button id="add-image">Add Another Image</button>
+      <button id="compare">Compare</button>
+    </form>
+    <div class="image-container" id="image-container"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

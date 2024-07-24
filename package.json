@@ -1,0 +1,10 @@
+{
+  "name": "image-comparison-tool",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "serve index.html"
+  },
+  "dependencies": {
+    "serve": "^11.3.2"
+  }
+}
