@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newInput = document.createElement('input');
     newInput.type = 'file';
     newInput.accept = 'image/*';
-    form.appendChild(newInput);
+    form.insertBefore(newInput, compareBtn);
     imageInputs.push(newInput);
   });
 

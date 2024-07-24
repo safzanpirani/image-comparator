@@ -70,6 +70,13 @@
     .button:hover {
       background-color: #45a049;
     }
+    .button-margin {
+      margin-bottom: 20px;
+    }
+    .center {
+      display: flex;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -84,18 +91,20 @@
       <form id="image-form">
         <input type="file" id="image-1" accept="image/*">
         <input type="file" id="image-2" accept="image/*">
-        <button type="button" id="add-image" class="button">Add Another Image</button>
+        <button type="button" id="add-image" class="button button-margin">Add Another Image</button>
         <button type="button" id="compare" class="button">Compare</button>
       </form>
       <div class="image-container" id="image-container"></div>
-      <button id="download" class="button" style="display: none;">Download Combined Image</button>
+      <div class="center">
+        <button id="download" class="button" style="display: none;">Download Combined Image</button>
+      </div>
     </div>
 
     <div id="compression" class="tab-content">
       <h1>Image Compression Tool</h1>
       <form id="compression-form">
         <input type="file" id="image-to-compress" accept="image/*">
-        <button type="button" id="compress" class="button">Compress</button>
+        <button type="button" id="compress" class="button button-margin">Compress</button>
       </form>
       <div id="compression-result"></div>
     </div>
