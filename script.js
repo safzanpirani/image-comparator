@@ -52,14 +52,18 @@ function displayImages() {
 }
 
 downloadBtn.addEventListener('click', () => {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
   const imageWidth = 400; // adjust this value to change the image width
+  const maxHeight = Math.max(...images.map(image => image.height));
+  const canvas = document.createElement('canvas');
   canvas.width = imageWidth * images.length;
-  canvas.height = imageWidth / (images[0].width / images[0].height);
+  canvas.height = maxHeight;
+  const ctx = canvas.getContext('2d');
 
   images.forEach((image, index) => {
-    ctx.drawImage(image, index * imageWidth, 0, imageWidth, canvas.height);
+    const aspectRatio = image.width / image.height;
+    const newWidth = aspectRatio * maxHeight;
+    const x = index * imageWidth + (imageWidth - newWidth) / 2;
+    ctx.drawImage(image, x, 0, newWidth, maxHeight);
   });
 
   const dataURL = canvas.toDataURL();
