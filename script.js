@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.onload = () => {
           const img = new Image();
           img.src = reader.result;
+          img.classList.add('image-preview');
           images.push(img);
           if (images.length === imageInputs.length) {
             displayImages();
@@ -68,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     images.forEach((image) => {
       const img = document.createElement('img');
       img.src = image.src;
+      img.classList.add('image-preview');
       imageContainer.appendChild(img);
     });
 
@@ -129,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const dataURL = canvas.toDataURL('image/jpeg', 0.5); // adjust compression quality here
           const compressedImg = new Image();
           compressedImg.src = dataURL;
+          compressedImg.classList.add('image-preview');
           compressionResultJPG.innerHTML = '';
           compressionResultJPG.appendChild(compressedImg);
 
@@ -161,13 +164,14 @@ document.addEventListener('DOMContentLoaded', () => {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           // Reduce the dimensions of the image
-          const scale = 0.8; // adjust the scale factor as needed
+          const scale = 0.7; // adjust the scale factor as needed
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           const dataURL = canvas.toDataURL('image/png'); // adjust compression quality here
           const compressedImg = new Image();
           compressedImg.src = dataURL;
+          compressedImg.classList.add('image-preview');
           compressionResultPNG.innerHTML = '';
           compressionResultPNG.appendChild(compressedImg);
 
