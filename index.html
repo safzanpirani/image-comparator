@@ -81,23 +81,37 @@
       max-width: 100%;
       height: auto;
     }
-    #resize-form div {
-      margin: 10px 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    #resize-form label {
-     margin-right: 10px;
-    }
-    .center {
-     display: flex;
-     justify-content: center;
-    }
-    .image-preview {
-      max-width: 100%;
-      height: auto;
-    }
+    /* Add this in your existing CSS */
+#resize-form div {
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#resize-form label {
+  margin-right: 10px;
+}
+.center {
+  display: flex;
+  justify-content: center;
+}
+.image-preview {
+  max-width: 100%;
+  height: auto;
+}
+#resize {
+  text-align: center;
+}
+#resize-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#resize-form label,
+#resize-form input {
+  margin: 5px;
+}
+
   </style>
 </head>
 <body>
