@@ -39,13 +39,10 @@ compareBtn.addEventListener('click', (e) => {
 
 function displayImages() {
   imageContainer.innerHTML = '';
-  const imageWidth = 400; // adjust this value to change the image width
 
-  images.forEach((image, index) => {
+  images.forEach((image) => {
     const img = document.createElement('img');
     img.src = image.src;
-    img.width = imageWidth;
-    img.style.float = 'left'; // add this line to float the images to the left
     imageContainer.appendChild(img);
   });
 
