@@ -41,20 +41,13 @@ function displayImages() {
   imageContainer.innerHTML = '';
   const imageWidth = 400; // adjust this value to change the image width
 
-  const imagesContainer = document.createElement('div');
-  imagesContainer.style.display = 'flex';
-  imagesContainer.style.flexWrap = 'wrap';
-  imagesContainer.style.justifyContent = 'center';
-
   images.forEach((image, index) => {
     const img = document.createElement('img');
     img.src = image.src;
     img.width = imageWidth;
-    img.style.margin = '100px'; // add some margin between images
-    imagesContainer.appendChild(img);
+    img.style.float = 'left'; // add this line to float the images to the left
+    imageContainer.appendChild(img);
   });
-
-  imageContainer.appendChild(imagesContainer);
 
   downloadBtn.style.display = 'block';
 }
