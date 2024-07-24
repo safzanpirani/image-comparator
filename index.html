@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Comparison Tool</title>
+  <title>Image Tool</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,6 +12,27 @@
       max-width: 800px;
       margin: 40px auto;
       text-align: center;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .tabs button {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      background-color: #ddd;
+      margin: 0 5px;
+    }
+    .tabs button.active {
+      background-color: #bbb;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
     }
     .image-container {
       display: flex;
@@ -35,15 +56,31 @@
 </head>
 <body>
   <div class="container">
-    <h1>Image Comparison Tool</h1>
-    <form id="image-form">
-      <input type="file" id="image-1" accept="image/*">
-      <input type="file" id="image-2" accept="image/*">
-      <button type="button" id="add-image">Add Another Image</button>
-      <button type="button" id="compare">Compare</button>
-    </form>
-    <div class="image-container" id="image-container"></div>
-    <button id="download" style="display: none;">Download Combined Image</button>
+    <div class="tabs">
+      <button class="tab-link" onclick="openTab(event, 'comparison')">Image Comparison</button>
+      <button class="tab-link" onclick="openTab(event, 'compression')">Image Compression</button>
+    </div>
+
+    <div id="comparison" class="tab-content">
+      <h1>Image Comparison Tool</h1>
+      <form id="image-form">
+        <input type="file" id="image-1" accept="image/*">
+        <input type="file" id="image-2" accept="image/*">
+        <button type="button" id="add-image">Add Another Image</button>
+        <button type="button" id="compare">Compare</button>
+      </form>
+      <div class="image-container" id="image-container"></div>
+      <button id="download" style="display: none;">Download Combined Image</button>
+    </div>
+
+    <div id="compression" class="tab-content">
+      <h1>Image Compression Tool</h1>
+      <form id="compression-form">
+        <input type="file" id="image-to-compress" accept="image/*">
+        <button type="button" id="compress">Compress</button>
+      </form>
+      <div id="compression-result"></div>
+    </div>
   </div>
 
   <script src="script.js"></script>
