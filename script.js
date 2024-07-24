@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tabLinks[0].click(); // Open the first tab by default
 
+  // Image Comparison Logic
   const form = document.getElementById('image-form');
   const imageContainer = document.getElementById('image-container');
   const addImageBtn = document.getElementById('add-image');
@@ -43,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     images = [];
 
-    imageInputs = document.querySelectorAll('input[type="file"]');
+    imageInputs = document.querySelectorAll('#image-form input[type="file"]');
 
     imageInputs.forEach((input) => {
       if (input.files.length > 0) {
@@ -106,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     a.click();
   });
 
+  // Image Compression Logic
   const compressionForm = document.getElementById('compression-form');
   const compressBtn = document.getElementById('compress');
   const compressionResult = document.getElementById('compression-result');
