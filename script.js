@@ -41,29 +41,47 @@ function displayImages() {
   imageContainer.innerHTML = '';
   const imageWidth = 400; // adjust this value to change the image width
 
+  const imagesContainer = document.createElement('div');
+  imagesContainer.style.display = 'flex';
+  imagesContainer.style.flexWrap = 'wrap';
+  imagesContainer.style.justifyContent = 'center';
+
   images.forEach((image, index) => {
     const img = document.createElement('img');
     img.src = image.src;
     img.width = imageWidth;
-    imageContainer.appendChild(img);
+    imagesContainer.appendChild(img);
   });
+
+  imageContainer.appendChild(imagesContainer);
 
   downloadBtn.style.display = 'block';
 }
 
 downloadBtn.addEventListener('click', () => {
   const imageWidth = 400; // adjust this value to change the image width
-  const maxHeight = Math.max(...images.map(image => image.height));
+  let totalWidth = 0;
+  let maxHeight = 0;
+
+  images.forEach((image) => {
+    const aspectRatio = image.width / image.height;
+    const newHeight = imageWidth / aspectRatio;
+    totalWidth += imageWidth;
+    maxHeight = Math.max(maxHeight, newHeight);
+  });
+
   const canvas = document.createElement('canvas');
-  canvas.width = imageWidth * images.length;
+  canvas.width = totalWidth;
   canvas.height = maxHeight;
   const ctx = canvas.getContext('2d');
 
-  images.forEach((image, index) => {
+  let x = 0;
+  images.forEach((image) => {
     const aspectRatio = image.width / image.height;
-    const newWidth = aspectRatio * maxHeight;
-    const x = index * imageWidth + (imageWidth - newWidth) / 2;
-    ctx.drawImage(image, x, 0, newWidth, maxHeight);
+    const newHeight = imageWidth / aspectRatio;
+    const y = (maxHeight - newHeight) / 2;
+    ctx.drawImage(image, x, y, imageWidth, newHeight);
+    x += imageWidth;
   });
 
   const dataURL = canvas.toDataURL();
