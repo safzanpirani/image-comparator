@@ -2,6 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabLinks = document.querySelectorAll('.tab-link');
   const tabContents = document.querySelectorAll('.tab-content');
 
+  tabLinks.forEach(link => {
+    link.addEventListener('click', (event) => {
+      const tabName = event.currentTarget.getAttribute('data-tab');
+      openTab(event, tabName);
+    });
+  });
+
   function openTab(evt, tabName) {
     tabContents.forEach(content => {
       content.classList.remove('active');
