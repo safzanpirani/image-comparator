@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
           canvas.width = img.width;
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0, img.width, img.height);
-          const dataURL = canvas.toDataURL('image/jpeg', 0.75); // adjust compression quality here
+          const dataURL = canvas.toDataURL('image/png'); // adjust compression quality here
           const compressedImg = new Image();
           compressedImg.src = dataURL;
           compressionResult.innerHTML = '';
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const a = document.createElement('a');
           a.href = dataURL;
-          a.download = 'compressed-image.jpg';
+          a.download = 'compressed-image.png';
           a.className = 'button';
           a.innerText = 'Download Compressed Image';
           compressionResult.appendChild(a);
