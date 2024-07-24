@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   downloadBtn.addEventListener('click', () => {
-    const imageWidth = 400; // adjust this value to change the image width
+    const imageWidth = 960; // adjust this value to change the image width
     let totalWidth = 0;
     let maxHeight = 0;
 
