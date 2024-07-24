@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const addImageBtn = document.getElementById('add-image');
   const compareBtn = document.getElementById('compare');
   const downloadBtn = document.getElementById('download');
-  const uploadBtn = document.getElementById('upload');
 
   let images = [];
   let imageInputs = [];
@@ -37,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newInput = document.createElement('input');
     newInput.type = 'file';
     newInput.accept = 'image/*';
-    form.insertBefore(newInput, uploadBtn);
+    form.appendChild(newInput);
     imageInputs.push(newInput);
   });
 
@@ -106,11 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
     a.href = dataURL;
     a.download = 'combined-image.png';
     a.click();
-  });
-
-  // Placeholder for the upload button logic
-  uploadBtn.addEventListener('click', () => {
-    alert('Upload functionality is not implemented yet.');
   });
 
   // Image Compression Logic
