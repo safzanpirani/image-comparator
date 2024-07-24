@@ -123,9 +123,11 @@ document.addEventListener('DOMContentLoaded', () => {
         img.onload = () => {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0, img.width, img.height);
+          // Reduce the dimensions of the image
+          const scale = 0.7; // adjust the scale factor as needed
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           const dataURL = canvas.toDataURL('image/png'); // adjust compression quality here
           const compressedImg = new Image();
           compressedImg.src = dataURL;
