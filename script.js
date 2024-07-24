@@ -147,9 +147,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+// Add this in your existing JavaScript
 const resizeForm = document.getElementById('resize-form');
 const resizeBtn = document.getElementById('resize-image');
 const resizeResult = document.getElementById('resize-result');
+const resizePreview = document.getElementById('resize-preview');
+
+document.getElementById('image-to-resize').addEventListener('change', (e) => {
+  const input = e.target;
+  if (input.files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.src = reader.result;
+      img.classList.add('image-preview');
+      resizePreview.innerHTML = '';
+      resizePreview.appendChild(img);
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+});
 
 resizeBtn.addEventListener('click', (e) => {
   e.preventDefault();
@@ -202,6 +219,7 @@ resizeBtn.addEventListener('click', (e) => {
     reader.readAsDataURL(input.files[0]);
   }
 });
+``
 
   // Image Compression Logic (PNG)
   const compressionFormPNG = document.getElementById('compression-form-png');

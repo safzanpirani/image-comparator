@@ -83,6 +83,20 @@
     }
     #resize-form div {
       margin: 10px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #resize-form label {
+     margin-right: 10px;
+    }
+    .center {
+     display: flex;
+     justify-content: center;
+    }
+    .image-preview {
+      max-width: 100%;
+      height: auto;
     }
   </style>
 </head>
@@ -128,26 +142,29 @@
     </div>
   </div>
   <!-- Add this to your existing HTML -->
-    <div id="resize" class="tab-content">
-      <h1>Image Resize Tool</h1>
-      <form id="resize-form">
-        <input type="file" id="image-to-resize" accept="image/*">
-        <div>
-         <label for="resize-width">Width (px):</label>
-         <input type="number" id="resize-width">
-       </div>
-       <div>
-          <label for="resize-height">Height (px):</label>
-          <input type="number" id="resize-height">
-       </div>
-       <div>
-         <label for="resize-percentage">Scale (%):</label>
-         <input type="number" id="resize-percentage" min="0" max="400" step="1" value="100">
-        </div>
-       <button type="button" id="resize-image" class="button button-margin">Resize</button>
-      </form>
-     <div id="resize-result"></div>
-    </div>
+  <div id="resize" class="tab-content">
+    <h1>Image Resize Tool</h1>
+    <form id="resize-form">
+      <input type="file" id="image-to-resize" accept="image/*">
+      <div>
+        <label for="resize-width">Width (px):</label>
+        <input type="number" id="resize-width">
+      </div>
+      <div>
+        <label for="resize-height">Height (px):</label>
+        <input type="number" id="resize-height">
+      </div>
+      <div>
+        <label for="resize-percentage">Scale (%):</label>
+        <input type="number" id="resize-percentage" min="0" max="400" step="1" value="100">
+      </div>
+      <div class="center">
+        <button type="button" id="resize-image" class="button button-margin">Resize</button>
+      </div>
+    </form>
+    <div id="resize-preview" class="image-container"></div>
+    <div id="resize-result" class="center"></div>
+  </div>
 
 
   <script src="script.js"></script>
