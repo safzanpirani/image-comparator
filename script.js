@@ -50,7 +50,7 @@ function displayImages() {
     const img = document.createElement('img');
     img.src = image.src;
     img.width = imageWidth;
-    img.style.margin = '10px'; // add some margin between images
+    img.style.margin = '100px'; // add some margin between images
     imagesContainer.appendChild(img);
   });
 
