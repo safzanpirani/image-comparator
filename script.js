@@ -107,14 +107,51 @@ document.addEventListener('DOMContentLoaded', () => {
     a.click();
   });
 
-  // Image Compression Logic
-  const compressionForm = document.getElementById('compression-form');
-  const compressBtn = document.getElementById('compress');
-  const compressionResult = document.getElementById('compression-result');
+  // Image Compression Logic (JPG)
+  const compressionFormJPG = document.getElementById('compression-form-jpg');
+  const compressBtnJPG = document.getElementById('compress-jpg');
+  const compressionResultJPG = document.getElementById('compression-result-jpg');
 
-  compressBtn.addEventListener('click', (e) => {
+  compressBtnJPG.addEventListener('click', (e) => {
     e.preventDefault();
-    const input = document.getElementById('image-to-compress');
+    const input = document.getElementById('image-to-compress-jpg');
+    if (input.files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0, img.width, img.height);
+          const dataURL = canvas.toDataURL('image/jpeg', 0.5); // adjust compression quality here
+          const compressedImg = new Image();
+          compressedImg.src = dataURL;
+          compressionResultJPG.innerHTML = '';
+          compressionResultJPG.appendChild(compressedImg);
+
+          const a = document.createElement('a');
+          a.href = dataURL;
+          a.download = 'compressed-image.jpg';
+          a.className = 'button';
+          a.innerText = 'Download Compressed Image';
+          compressionResultJPG.appendChild(a);
+        };
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  });
+
+  // Image Compression Logic (PNG)
+  const compressionFormPNG = document.getElementById('compression-form-png');
+  const compressBtnPNG = document.getElementById('compress-png');
+  const compressionResultPNG = document.getElementById('compression-result-png');
+
+  compressBtnPNG.addEventListener('click', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('image-to-compress-png');
     if (input.files.length > 0) {
       const reader = new FileReader();
       reader.onload = () => {
@@ -124,22 +161,22 @@ document.addEventListener('DOMContentLoaded', () => {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           // Reduce the dimensions of the image
-          const scale = 0.7; // adjust the scale factor as needed
+          const scale = 0.8; // adjust the scale factor as needed
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           const dataURL = canvas.toDataURL('image/png'); // adjust compression quality here
           const compressedImg = new Image();
           compressedImg.src = dataURL;
-          compressionResult.innerHTML = '';
-          compressionResult.appendChild(compressedImg);
+          compressionResultPNG.innerHTML = '';
+          compressionResultPNG.appendChild(compressedImg);
 
           const a = document.createElement('a');
           a.href = dataURL;
           a.download = 'compressed-image.png';
           a.className = 'button';
           a.innerText = 'Download Compressed Image';
-          compressionResult.appendChild(a);
+          compressionResultPNG.appendChild(a);
         };
       };
       reader.readAsDataURL(input.files[0]);

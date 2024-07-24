@@ -83,7 +83,8 @@
   <div class="container">
     <div class="tabs">
       <button class="tab-link" data-tab="comparison">Image Comparison</button>
-      <button class="tab-link" data-tab="compression">Image Compression</button>
+      <button class="tab-link" data-tab="compression-jpg">Image Compression (JPG)</button>
+      <button class="tab-link" data-tab="compression-png">Image Compression (PNG)</button>
     </div>
 
     <div id="comparison" class="tab-content">
@@ -100,13 +101,22 @@
       </div>
     </div>
 
-    <div id="compression" class="tab-content">
-      <h1>Image Compression Tool</h1>
-      <form id="compression-form">
-        <input type="file" id="image-to-compress" accept="image/*">
-        <button type="button" id="compress" class="button button-margin">Compress</button>
+    <div id="compression-jpg" class="tab-content">
+      <h1>Image Compression Tool (JPG)</h1>
+      <form id="compression-form-jpg">
+        <input type="file" id="image-to-compress-jpg" accept="image/*">
+        <button type="button" id="compress-jpg" class="button button-margin">Compress</button>
       </form>
-      <div id="compression-result"></div>
+      <div id="compression-result-jpg"></div>
+    </div>
+
+    <div id="compression-png" class="tab-content">
+      <h1>Image Compression Tool (PNG)</h1>
+      <form id="compression-form-png">
+        <input type="file" id="image-to-compress-png" accept="image/*">
+        <button type="button" id="compress-png" class="button button-margin">Compress</button>
+      </form>
+      <div id="compression-result-png"></div>
     </div>
   </div>
 
