@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const tabLinks = document.querySelectorAll('.tab-link');
   const tabContents = document.querySelectorAll('.tab-content');
+  const Cropper = require('cropperjs');
 
   tabLinks.forEach(link => {
     link.addEventListener('click', (event) => {
@@ -108,6 +109,47 @@ document.addEventListener('DOMContentLoaded', () => {
     a.download = 'combined-image.png';
     a.click();
   });
+
+  const cropForm = document.getElementById('crop-form');
+const cropBtn = document.getElementById('crop-btn');
+const cropResult = document.getElementById('crop-result');
+const cropImage = document.getElementById('crop-image');
+
+cropForm.addEventListener('change', (e) => {
+  const input = e.target;
+  if (input.files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      cropImage.src = reader.result;
+      const cropper = new Cropper(cropImage, {
+        aspectRatio: 1,
+        crop: (event) => {
+          console.log(event.detail.x, event.detail.y, event.detail.width, event.detail.height);
+        },
+      });
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+});
+
+cropBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  const cropper = Cropper.getInstance(cropImage);
+  const canvas = cropper.getCroppedCanvas();
+  const dataURL = canvas.toDataURL('image/png');
+  const croppedImg = new Image();
+  croppedImg.src = dataURL;
+  croppedImg.classList.add('image-preview');
+  cropResult.innerHTML = '';
+  cropResult.appendChild(croppedImg);
+
+  const a = document.createElement('a');
+  a.href = dataURL;
+  a.download = 'cropped-image.png';
+  a.className = 'button';
+  a.innerText = 'Download Cropped Image';
+  cropResult.appendChild(a);
+});
 
   // Image Compression Logic (JPG)
   const compressionFormJPG = document.getElementById('compression-form-jpg');

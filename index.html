@@ -112,6 +112,20 @@
   margin: 5px;
 }
 
+.crop-container {
+  width: 50%;
+  height: 50vh;
+  margin: 20px auto;
+  border: 1px solid #ddd;
+  overflow: hidden;
+}
+
+#crop-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
   </style>
 </head>
 <body>
@@ -121,6 +135,7 @@
       <button class="tab-link" data-tab="compression-jpg">Image Compression (JPG)</button>
       <button class="tab-link" data-tab="compression-png">Image Compression (PNG)</button>
       <button class="tab-link" data-tab="resize">Image Resize</button>
+      <button class="tab-link" data-tab="crop">Image Crop</button>
     </div>
 
     <div id="comparison" class="tab-content">
@@ -178,6 +193,17 @@
     </form>
     <div id="resize-preview" class="image-container"></div>
     <div id="resize-result" class="center"></div>
+  </div>
+  <div id="crop" class="tab-content">
+    <h1>Image Crop Tool</h1>
+    <form id="crop-form">
+      <input type="file" id="image-to-crop" accept="image/*">
+      <div class="crop-container">
+        <img id="crop-image" src="" alt="Image to crop">
+      </div>
+      <button type="button" id="crop-btn" class="button button-margin">Crop</button>
+    </form>
+    <div id="crop-result" class="center"></div>
   </div>
 
 
