@@ -129,7 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (selectedAspectRatio === 'free') {
         cropper.setAspectRatio(NaN);
       } else {
-        cropper.setAspectRatio(parseFloat(selectedAspectRatio));
+        const [width, height] = selectedAspectRatio.split('/').map(Number);
+        cropper.setAspectRatio(width / height);
       }
     }
   });
@@ -144,8 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
           cropper.destroy();
         }
         const selectedAspectRatio = aspectRatioSelect.value;
+        const [width, height] = selectedAspectRatio === 'free' ? [NaN, NaN] : selectedAspectRatio.split('/').map(Number);
         cropper = new Cropper(cropImage, {
-          aspectRatio: selectedAspectRatio === 'free' ? NaN : parseFloat(selectedAspectRatio),
+          aspectRatio: selectedAspectRatio === 'free' ? NaN : (width / height),
           crop: (event) => {
             console.log(event.detail.x, event.detail.y, event.detail.width, event.detail.height);
           },
