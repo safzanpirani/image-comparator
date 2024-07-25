@@ -116,11 +116,23 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Crop Logic
+  const aspectRatioSelect = document.getElementById('aspect-ratio');
   const cropForm = document.getElementById('crop-form');
   const cropBtn = document.getElementById('crop-btn');
   const cropResult = document.getElementById('crop-result');
   const cropImage = document.getElementById('crop-image');
   let cropper;
+
+  aspectRatioSelect.addEventListener('change', () => {
+    if (cropper) {
+      const selectedAspectRatio = aspectRatioSelect.value;
+      if (selectedAspectRatio === 'free') {
+        cropper.setAspectRatio(NaN);
+      } else {
+        cropper.setAspectRatio(parseFloat(selectedAspectRatio));
+      }
+    }
+  });
 
   cropForm.addEventListener('change', (e) => {
     const input = e.target;
@@ -131,8 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cropper) {
           cropper.destroy();
         }
+        const selectedAspectRatio = aspectRatioSelect.value;
         cropper = new Cropper(cropImage, {
-          aspectRatio: 1,
+          aspectRatio: selectedAspectRatio === 'free' ? NaN : parseFloat(selectedAspectRatio),
           crop: (event) => {
             console.log(event.detail.x, event.detail.y, event.detail.width, event.detail.height);
           },

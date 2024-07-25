@@ -196,6 +196,21 @@
       <h1>Image Crop Tool</h1>
       <form id="crop-form">
         <input type="file" id="image-to-crop" accept="image/*">
+        <div>
+          <label for="aspect-ratio">Aspect Ratio:</label>
+          <select id="aspect-ratio">
+            <option value="free">Free</option>
+            <option value="1">1:1 (Square)</option>
+            <option value="2/3">2:3</option>
+            <option value="3/2">3:2</option>
+            <option value="3/4">3:4</option>
+            <option value="4/3">4:3</option>
+            <option value="4/5">4:5</option>
+            <option value="5/4">5:4</option>
+            <option value="9/16">9:16</option>
+            <option value="16/9">16:9</option>
+          </select>
+        </div>
         <div class="crop-container">
           <img id="crop-image" src="" alt="Image to crop">
         </div>
@@ -203,7 +218,6 @@
       </form>
       <div id="crop-result" class="center"></div>
     </div>
-  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   <script src="script.js"></script>
