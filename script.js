@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const tabLinks = document.querySelectorAll('.tab-link');
   const tabContents = document.querySelectorAll('.tab-content');
-  const Cropper = require('cropperjs');
+  
 
   tabLinks.forEach(link => {
     link.addEventListener('click', (event) => {
@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  
   function openTab(evt, tabName) {
     tabContents.forEach(content => {
       content.classList.remove('active');
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const addImageBtn = document.getElementById('add-image');
   const compareBtn = document.getElementById('compare');
   const downloadBtn = document.getElementById('download');
-
+  const Cropper = require('cropperjs');
   let images = [];
   let imageInputs = [];
 
