@@ -1,7 +1,8 @@
+import Cropper from 'cropperjs';
+
 document.addEventListener('DOMContentLoaded', () => {
   const tabLinks = document.querySelectorAll('.tab-link');
   const tabContents = document.querySelectorAll('.tab-content');
-  
 
   tabLinks.forEach(link => {
     link.addEventListener('click', (event) => {
@@ -10,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  
   function openTab(evt, tabName) {
     tabContents.forEach(content => {
       content.classList.remove('active');
@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const addImageBtn = document.getElementById('add-image');
   const compareBtn = document.getElementById('compare');
   const downloadBtn = document.getElementById('download');
-  const Cropper = require('cropperjs');
   let images = [];
   let imageInputs = [];
 
@@ -111,46 +110,52 @@ document.addEventListener('DOMContentLoaded', () => {
     a.click();
   });
 
+  // Crop Logic
   const cropForm = document.getElementById('crop-form');
-const cropBtn = document.getElementById('crop-btn');
-const cropResult = document.getElementById('crop-result');
-const cropImage = document.getElementById('crop-image');
+  const cropBtn = document.getElementById('crop-btn');
+  const cropResult = document.getElementById('crop-result');
+  const cropImage = document.getElementById('crop-image');
+  let cropper;
 
-cropForm.addEventListener('change', (e) => {
-  const input = e.target;
-  if (input.files.length > 0) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      cropImage.src = reader.result;
-      const cropper = new Cropper(cropImage, {
-        aspectRatio: 1,
-        crop: (event) => {
-          console.log(event.detail.x, event.detail.y, event.detail.width, event.detail.height);
-        },
-      });
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-});
+  cropForm.addEventListener('change', (e) => {
+    const input = e.target;
+    if (input.files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        cropImage.src = reader.result;
+        if (cropper) {
+          cropper.destroy();
+        }
+        cropper = new Cropper(cropImage, {
+          aspectRatio: 1,
+          crop: (event) => {
+            console.log(event.detail.x, event.detail.y, event.detail.width, event.detail.height);
+          },
+        });
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  });
 
-cropBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  const cropper = Cropper.getInstance(cropImage);
-  const canvas = cropper.getCroppedCanvas();
-  const dataURL = canvas.toDataURL('image/png');
-  const croppedImg = new Image();
-  croppedImg.src = dataURL;
-  croppedImg.classList.add('image-preview');
-  cropResult.innerHTML = '';
-  cropResult.appendChild(croppedImg);
+  cropBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (cropper) {
+      const canvas = cropper.getCroppedCanvas();
+      const dataURL = canvas.toDataURL('image/png');
+      const croppedImg = new Image();
+      croppedImg.src = dataURL;
+      croppedImg.classList.add('image-preview');
+      cropResult.innerHTML = '';
+      cropResult.appendChild(croppedImg);
 
-  const a = document.createElement('a');
-  a.href = dataURL;
-  a.download = 'cropped-image.png';
-  a.className = 'button';
-  a.innerText = 'Download Cropped Image';
-  cropResult.appendChild(a);
-});
+      const a = document.createElement('a');
+      a.href = dataURL;
+      a.download = 'cropped-image.png';
+      a.className = 'button';
+      a.innerText = 'Download Cropped Image';
+      cropResult.appendChild(a);
+    }
+  });
 
   // Image Compression Logic (JPG)
   const compressionFormJPG = document.getElementById('compression-form-jpg');
@@ -190,80 +195,6 @@ cropBtn.addEventListener('click', (e) => {
     }
   });
 
-// Add this in your existing JavaScript
-const resizeForm = document.getElementById('resize-form');
-const resizeBtn = document.getElementById('resize-image');
-const resizeResult = document.getElementById('resize-result');
-const resizePreview = document.getElementById('resize-preview');
-
-document.getElementById('image-to-resize').addEventListener('change', (e) => {
-  const input = e.target;
-  if (input.files.length > 0) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.src = reader.result;
-      img.classList.add('image-preview');
-      resizePreview.innerHTML = '';
-      resizePreview.appendChild(img);
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-});
-
-resizeBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  const input = document.getElementById('image-to-resize');
-  const widthInput = document.getElementById('resize-width');
-  const heightInput = document.getElementById('resize-height');
-  const percentageInput = document.getElementById('resize-percentage');
-  
-  if (input.files.length > 0) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.src = reader.result;
-      img.onload = () => {
-        let width = img.width;
-        let height = img.height;
-        const percentage = percentageInput.value / 100;
-        
-        if (widthInput.value) {
-          width = parseInt(widthInput.value);
-          height = width / img.width * img.height;
-        } else if (heightInput.value) {
-          height = parseInt(heightInput.value);
-          width = height / img.height * img.width;
-        } else {
-          width *= percentage;
-          height *= percentage;
-        }
-
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(img, 0, 0, width, height);
-        const dataURL = canvas.toDataURL('image/png'); // Output resized image as PNG
-        const resizedImg = new Image();
-        resizedImg.src = dataURL;
-        resizedImg.classList.add('image-preview');
-        resizeResult.innerHTML = '';
-        resizeResult.appendChild(resizedImg);
-
-        const a = document.createElement('a');
-        a.href = dataURL;
-        a.download = 'resized-image.png';
-        a.className = 'button';
-        a.innerText = 'Download Resized Image';
-        resizeResult.appendChild(a);
-      };
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-});
-``
-
   // Image Compression Logic (PNG)
   const compressionFormPNG = document.getElementById('compression-form-png');
   const compressBtnPNG = document.getElementById('compress-png');
@@ -298,6 +229,79 @@ resizeBtn.addEventListener('click', (e) => {
           a.className = 'button';
           a.innerText = 'Download Compressed Image';
           compressionResultPNG.appendChild(a);
+        };
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  });
+
+  // Resize Logic
+  const resizeForm = document.getElementById('resize-form');
+  const resizeBtn = document.getElementById('resize-image');
+  const resizeResult = document.getElementById('resize-result');
+  const resizePreview = document.getElementById('resize-preview');
+
+  document.getElementById('image-to-resize').addEventListener('change', (e) => {
+    const input = e.target;
+    if (input.files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.src = reader.result;
+        img.classList.add('image-preview');
+        resizePreview.innerHTML = '';
+        resizePreview.appendChild(img);
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  });
+
+  resizeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('image-to-resize');
+    const widthInput = document.getElementById('resize-width');
+    const heightInput = document.getElementById('resize-height');
+    const percentageInput = document.getElementById('resize-percentage');
+    
+    if (input.files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          const percentage = percentageInput.value / 100;
+          
+          if (widthInput.value) {
+            width = parseInt(widthInput.value);
+            height = width / img.width * img.height;
+          } else if (heightInput.value) {
+            height = parseInt(heightInput.value);
+            width = height / img.height * img.width;
+          } else {
+            width *= percentage;
+            height *= percentage;
+          }
+
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataURL = canvas.toDataURL('image/png'); // Output resized image as PNG
+          const resizedImg = new Image();
+          resizedImg.src = dataURL;
+          resizedImg.classList.add('image-preview');
+          resizeResult.innerHTML = '';
+          resizeResult.appendChild(resizedImg);
+
+          const a = document.createElement('a');
+          a.href = dataURL;
+          a.download = 'resized-image.png';
+          a.className = 'button';
+          a.innerText = 'Download Resized Image';
+          resizeResult.appendChild(a);
         };
       };
       reader.readAsDataURL(input.files[0]);
