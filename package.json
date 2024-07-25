@@ -5,6 +5,7 @@
     "start": "serve index.html"
   },
   "dependencies": {
-    "serve": "^11.3.2"
+    "serve": "^11.3.2",
+    "cropperjs": "^1.5.12"
   }
 }
