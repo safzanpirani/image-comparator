@@ -1,4 +1,5 @@
-import Cropper from 'cropperjs';
+// Remove the redundant import and require statement
+// import Cropper from 'cropperjs'; // Remove this if using direct script inclusion
 
 document.addEventListener('DOMContentLoaded', () => {
   const tabLinks = document.querySelectorAll('.tab-link');
@@ -22,7 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
     evt.currentTarget.classList.add('active');
   }
 
-  tabLinks[0].click(); // Open the first tab by default
+  // Automatically open the first tab
+  if (tabLinks.length > 0) {
+    tabLinks[0].click();
+  }
+
 
   // Image Comparison Logic
   const form = document.getElementById('image-form');
