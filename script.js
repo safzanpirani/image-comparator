@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
           a.href = dataURL;
           a.download = 'compressed-image.jpg';
           a.className = 'button';
-          a.innerText = 'Download Compressed Image';
+          a.innerText = 'download compressed image';
           compressionResultJPG.appendChild(a);
         };
       };
@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
           a.href = dataURL;
           a.download = 'compressed-image.png';
           a.className = 'button';
-          a.innerText = 'Download Compressed Image';
+          a.innerText = 'download compressed image';
           compressionResultPNG.appendChild(a);
         };
       };
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
           a.href = dataURL;
           a.download = 'resized-image.png';
           a.className = 'button';
-          a.innerText = 'Download Resized Image';
+          a.innerText = 'download resized image';
           resizeResult.appendChild(a);
         };
       };

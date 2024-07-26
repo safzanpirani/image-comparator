@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Tool</title>
+  <title>image tool</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
   <style>
     body {
@@ -129,11 +129,11 @@
 <body>
   <div class="container">
     <div class="tabs">
-      <button class="tab-link" data-tab="comparison">Image Comparison</button>
-      <button class="tab-link" data-tab="compression-jpg">Image Compression (JPG)</button>
-      <button class="tab-link" data-tab="compression-png">Image Compression (PNG)</button>
-      <button class="tab-link" data-tab="resize">Image Resize</button>
-      <button class="tab-link" data-tab="crop">Image Crop</button>
+      <button class="tab-link" data-tab="comparison">image comparison</button>
+      <button class="tab-link" data-tab="compression-jpg">image compression (jpg)</button>
+      <button class="tab-link" data-tab="compression-png">image compression (png)</button>
+      <button class="tab-link" data-tab="resize">image resize</button>
+      <button class="tab-link" data-tab="crop">image crop</button>
     </div>
 
     <div id="comparison" class="tab-content">
@@ -141,12 +141,12 @@
       <form id="image-form">
         <input type="file" id="image-1" accept="image/*">
         <input type="file" id="image-2" accept="image/*">
-        <button type="button" id="add-image" class="button button-margin">Add Another Image</button>
+        <button type="button" id="add-image" class="button button-margin">add another image</button>
         <button type="button" id="compare" class="button">Compare</button>
       </form>
       <div class="image-container" id="image-container"></div>
       <div class="center">
-        <button id="download" class="button" style="display: none;">Download Combined Image</button>
+        <button id="download" class="button" style="display: none;">download combined image</button>
       </div>
     </div>
 
@@ -154,7 +154,7 @@
       <h1>Image Compression Tool (JPG)</h1>
       <form id="compression-form-jpg">
         <input type="file" id="image-to-compress-jpg" accept="image/*">
-        <button type="button" id="compress-jpg" class="button button-margin">Compress</button>
+        <button type="button" id="compress-jpg" class="button button-margin">compress</button>
       </form>
       <div id="compression-result-jpg"></div>
     </div>
@@ -163,7 +163,7 @@
       <h1>Image Compression Tool (PNG)</h1>
       <form id="compression-form-png">
         <input type="file" id="image-to-compress-png" accept="image/*">
-        <button type="button" id="compress-png" class="button button-margin">Compress</button>
+        <button type="button" id="compress-png" class="button button-margin">compress</button>
       </form>
       <div id="compression-result-png"></div>
     </div>
@@ -173,15 +173,15 @@
       <form id="resize-form">
         <input type="file" id="image-to-resize" accept="image/*">
         <div>
-          <label for="resize-width">Width (px):</label>
+          <label for="resize-width">width (px):</label>
           <input type="number" id="resize-width">
         </div>
         <div>
-          <label for="resize-height">Height (px):</label>
+          <label for="resize-height">height (px):</label>
           <input type="number" id="resize-height">
         </div>
         <div>
-          <label for="resize-percentage">Scale (%):</label>
+          <label for="resize-percentage">scale (%):</label>
           <input type="number" id="resize-percentage" min="0" max="400" step="1" value="100">
         </div>
         <div class="center">
@@ -197,10 +197,10 @@
       <form id="crop-form">
         <input type="file" id="image-to-crop" accept="image/*">
         <div>
-          <label for="aspect-ratio">Aspect Ratio:</label>
+          <label for="aspect-ratio">aspect ratio:</label>
           <select id="aspect-ratio">
-            <option value="free">Free</option>
-            <option value="1">1:1 (Square)</option>
+            <option value="free">free</option>
+            <option value="1">1:1 (square)</option>
             <option value="2/3">2:3</option>
             <option value="3/2">3:2</option>
             <option value="3/4">3:4</option>
@@ -212,7 +212,7 @@
           </select>
         </div>
         <div class="crop-container">
-          <img id="crop-image" src="" alt="Image to crop">
+          <img id="crop-image" src="" alt="Upload a file to preview">
         </div>
         <button type="button" id="crop-btn" class="button button-margin">Crop</button>
       </form>
