@@ -128,6 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const selectedAspectRatio = aspectRatioSelect.value;
       if (selectedAspectRatio === 'free') {
         cropper.setAspectRatio(NaN);
+      } else if (selectedAspectRatio === '1') {
+        cropper.setAspectRatio(1);
       } else {
         const [width, height] = selectedAspectRatio.split('/').map(Number);
         cropper.setAspectRatio(width / height);
@@ -145,9 +147,17 @@ document.addEventListener('DOMContentLoaded', () => {
           cropper.destroy();
         }
         const selectedAspectRatio = aspectRatioSelect.value;
-        const [width, height] = selectedAspectRatio === 'free' ? [NaN, NaN] : selectedAspectRatio.split('/').map(Number);
+        let aspectRatio;
+        if (selectedAspectRatio === 'free') {
+          aspectRatio = NaN;
+        } else if (selectedAspectRatio === '1') {
+          aspectRatio = 1;
+        } else {
+          const [width, height] = selectedAspectRatio.split('/').map(Number);
+          aspectRatio = width / height;
+        }
         cropper = new Cropper(cropImage, {
-          aspectRatio: selectedAspectRatio === 'free' ? NaN : (width / height),
+          aspectRatio: aspectRatio,
           crop: (event) => {
             console.log(event.detail.x, event.detail.y, event.detail.width, event.detail.height);
           },
@@ -176,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
       cropResult.appendChild(a);
     }
   });
+
 
   // Image Compression Logic (JPG)
   const compressionFormJPG = document.getElementById('compression-form-jpg');
