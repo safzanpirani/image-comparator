@@ -144,6 +144,21 @@
       <button class="tab-link" data-tab="compression-png">image compression (png)</button>
       <button class="tab-link" data-tab="resize">image resize</button>
       <button class="tab-link" data-tab="crop">image crop</button>
+      <button class="tab-link" data-tab="flip">image flip</button>
+    </div>
+
+    <div id="flip" class="tab-content">
+      <h1>image flip tool</h1>
+      <form id="flip-form">
+        <input type="file" id="image-to-flip" accept="image/*">
+        <label for="flip-direction">flip direction:</label>
+        <select id="flip-direction">
+          <option value="horizontal">horizontal</option>
+          <option value="vertical">vertical</option>
+        </select>
+        <button type="button" id="flip-btn" class="button">flip</button>
+      </form>
+      <div id="flip-result" class="center"></div>
     </div>
 
     <div id="comparison" class="tab-content">

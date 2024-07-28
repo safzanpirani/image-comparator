@@ -338,4 +338,57 @@ document.addEventListener('DOMContentLoaded', () => {
       reader.readAsDataURL(input.files[0]);
     }
   });
+
+  const flipForm = document.getElementById('flip-form');
+const flipBtn = document.getElementById('flip-btn');
+const flipResult = document.getElementById('flip-result');
+const flipDirectionSelect = document.getElementById('flip-direction');
+
+flipForm.addEventListener('change', (e) => {
+  const input = e.target;
+  if (input.files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.src = reader.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const flipDirection = flipDirectionSelect.value;
+        if (flipDirection === 'horizontal') {
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(img, 0, 0);
+        } else if (flipDirection === 'vertical') {
+          ctx.translate(0, canvas.height);
+          ctx.scale(1, -1);
+          ctx.drawImage(img, 0, 0);
+        }
+        const flippedDataURL = canvas.toDataURL();
+        const flippedImg = new Image();
+        flippedImg.src = flippedDataURL;
+        flippedImg.classList.add('image-preview');
+        flipResult.innerHTML = '';
+        flipResult.appendChild(flippedImg);
+
+        const a = document.createElement('a');
+        a.href = flippedDataURL;
+        a.download = 'flipped-image.png';
+        a.className = 'button';
+        a.innerText = 'download flipped image';
+        flipResult.appendChild(a);
+      };
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+});
+
+flipBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  flipForm.dispatchEvent(new Event('change'));
+});
+
 });
