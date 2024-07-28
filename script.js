@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
           canvas.width = img.width;
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0, img.width, img.height);
-          const dataURL = canvas.toDataURL('image/jpeg', 0.5); // adjust compression quality here
+          const dataURL = canvas.toDataURL('image/jpeg', 0.7); // adjust compression quality here
           const compressedImg = new Image();
           compressedImg.src = dataURL;
           compressedImg.classList.add('image-preview');

@@ -17,6 +17,7 @@
     .tabs {
       display: flex;
       justify-content: center;
+      flex-wrap: wrap; /* Allow tabs to wrap to new lines */
       margin-bottom: 20px;
     }
     .tabs button {
@@ -24,7 +25,7 @@
       cursor: pointer;
       border: none;
       background-color: #ddd;
-      margin: 0 5px;
+      margin: 5px; /* Add margin for better spacing when wrapping */
     }
     .tabs button.active {
       background-color: #bbb;
@@ -82,7 +83,6 @@
       max-width: 100%;
       height: auto;
     }
-    /* Add this in your existing CSS */
     #resize-form div {
       margin: 10px 0;
       display: flex;
@@ -124,7 +124,17 @@
       height: 100%;
       object-fit: contain;
     }
+  
+    @media (max-width: 600px) {
+      .tabs {
+        flex-direction: column; /* Stack tabs vertically on smaller screens */
+      }
+      .tabs button {
+        width: 100%; /* Make buttons take the full width */
+      }
+    }
   </style>
+  
 </head>
 <body>
   <div class="container">
