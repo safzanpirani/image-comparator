@@ -344,8 +344,9 @@ const flipBtn = document.getElementById('flip-btn');
 const flipResult = document.getElementById('flip-result');
 const flipDirectionSelect = document.getElementById('flip-direction');
 
-flipForm.addEventListener('change', (e) => {
-  const input = e.target;
+flipBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('image-to-flip');
   if (input.files.length > 0) {
     const reader = new FileReader();
     reader.onload = () => {
@@ -386,9 +387,5 @@ flipForm.addEventListener('change', (e) => {
   }
 });
 
-flipBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  flipForm.dispatchEvent(new Event('change'));
-});
 
 });
