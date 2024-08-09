@@ -1,6 +1,3 @@
-// Remove the redundant import and require statement
-// import Cropper from 'cropperjs'; // Remove this if using direct script inclusion
-
 document.addEventListener('DOMContentLoaded', () => {
   const tabLinks = document.querySelectorAll('.tab-link');
   const tabContents = document.querySelectorAll('.tab-content');
@@ -27,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (tabLinks.length > 0) {
     tabLinks[0].click();
   }
-
 
   // Image Comparison Logic
   const form = document.getElementById('image-form');
@@ -187,7 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-
   // Image Compression Logic (JPG)
   const compressionFormJPG = document.getElementById('compression-form-jpg');
   const compressBtnJPG = document.getElementById('compress-jpg');
@@ -218,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
           a.href = dataURL;
           a.download = 'compressed-image.jpg';
           a.className = 'button';
-          a.innerText = 'download compressed image';
+          a.innerText = 'Download Compressed Image';
           compressionResultJPG.appendChild(a);
         };
       };
@@ -258,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
           a.href = dataURL;
           a.download = 'compressed-image.png';
           a.className = 'button';
-          a.innerText = 'download compressed image';
+          a.innerText = 'Download Compressed Image';
           compressionResultPNG.appendChild(a);
         };
       };
@@ -293,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const widthInput = document.getElementById('resize-width');
     const heightInput = document.getElementById('resize-height');
     const percentageInput = document.getElementById('resize-percentage');
-    
+
     if (input.files.length > 0) {
       const reader = new FileReader();
       reader.onload = () => {
@@ -303,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
           let width = img.width;
           let height = img.height;
           const percentage = percentageInput.value / 100;
-          
+
           if (widthInput.value) {
             width = parseInt(widthInput.value);
             height = width / img.width * img.height;
@@ -331,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
           a.href = dataURL;
           a.download = 'resized-image.png';
           a.className = 'button';
-          a.innerText = 'download resized image';
+          a.innerText = 'Download Resized Image';
           resizeResult.appendChild(a);
         };
       };
@@ -340,121 +335,89 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const flipForm = document.getElementById('flip-form');
-const flipBtn = document.getElementById('flip-btn');
-const flipResult = document.getElementById('flip-result');
-const flipDirectionSelect = document.getElementById('flip-direction');
+  const flipBtn = document.getElementById('flip-btn');
+  const flipResult = document.getElementById('flip-result');
+  const flipDirectionSelect = document.getElementById('flip-direction');
 
-flipBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  const input = document.getElementById('image-to-flip');
-  if (input.files.length > 0) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.src = reader.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-        const flipDirection = flipDirectionSelect.value;
-        if (flipDirection === 'horizontal') {
-          ctx.translate(canvas.width, 0);
-          ctx.scale(-1, 1);
+  flipBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('image-to-flip');
+    if (input.files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
           ctx.drawImage(img, 0, 0);
-        } else if (flipDirection === 'vertical') {
-          ctx.translate(0, canvas.height);
-          ctx.scale(1, -1);
-          ctx.drawImage(img, 0, 0);
-        }
-        const flippedDataURL = canvas.toDataURL();
-        const flippedImg = new Image();
-        flippedImg.src = flippedDataURL;
-        flippedImg.classList.add('image-preview');
-        flipResult.innerHTML = '';
-        flipResult.appendChild(flippedImg);
+          const flipDirection = flipDirectionSelect.value;
+          if (flipDirection === 'horizontal') {
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(img, 0, 0);
+          } else if (flipDirection === 'vertical') {
+            ctx.translate(0, canvas.height);
+            ctx.scale(1, -1);
+            ctx.drawImage(img, 0, 0);
+          }
+          const flippedDataURL = canvas.toDataURL();
+          const flippedImg = new Image();
+          flippedImg.src = flippedDataURL;
+          flippedImg.classList.add('image-preview');
+          flipResult.innerHTML = '';
+          flipResult.appendChild(flippedImg);
 
-        const a = document.createElement('a');
-        a.href = flippedDataURL;
-        a.download = 'flipped-image.png';
-        a.className = 'button';
-        a.innerText = 'download flipped image';
-        flipResult.appendChild(a);
+          const a = document.createElement('a');
+          a.href = flippedDataURL;
+          a.download = 'flipped-image.png';
+          a.className = 'button';
+          a.innerText = 'Download Flipped Image';
+          flipResult.appendChild(a);
+        };
       };
-    };
-    reader.readAsDataURL(input.files[0]);
-
-    const videoCompressionForm = document.getElementById('video-compression-form');
-const compressVideoBtn = document.getElementById('compress-video');
-const videoCompressionResult = document.getElementById('video-compression-result');
-
-compressVideoBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  const input = document.getElementById('video-to-compress');
-  if (input.files.length > 0) {
-    const file = input.files[0];
-    compressVideo(file);
-  }
-});
-
-async function compressVideo(file) {
-  const videoElement = document.createElement('video');
-  videoElement.src = URL.createObjectURL(file);
-  await videoElement.load();
-
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  const stream = canvas.captureStream();
-  const mediaRecorder = new MediaRecorder(stream, {
-    mimeType: 'video/webm',
-    videoBitsPerSecond: 1000000 // Adjust this value to change compression level
+      reader.readAsDataURL(input.files[0]);
+    }
   });
 
-  const chunks = [];
-  mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-  mediaRecorder.onstop = () => {
-    const blob = new Blob(chunks, { type: 'video/webm' });
-    const compressedVideoUrl = URL.createObjectURL(blob);
-    displayCompressedVideo(compressedVideoUrl);
-  };
+  // Video Compression Logic
+  const videoCompressionForm = document.getElementById('video-compression-form');
+  const compressVideoBtn = document.getElementById('compress-video');
+  const videoCompressionResult = document.getElementById('video-compression-result');
 
-  videoElement.onplay = () => {
-    canvas.width = videoElement.videoWidth / 2; // Reduce resolution
-    canvas.height = videoElement.videoHeight / 2;
-    mediaRecorder.start();
-    drawVideo();
-  };
+  compressVideoBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('video-to-compress');
+    if (input.files.length > 0) {
+      const file = input.files[0];
+      const { createFFmpeg, fetchFile } = FFmpeg;
+      const ffmpeg = createFFmpeg({ log: true });
 
-  function drawVideo() {
-    if (videoElement.paused || videoElement.ended) {
-      mediaRecorder.stop();
-      return;
+      try {
+        await ffmpeg.load();
+        ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
+        await ffmpeg.run('-i', 'input.mp4', '-vcodec', 'libx264', '-crf', '23', 'output.mp4');
+        const data = ffmpeg.FS('readFile', 'output.mp4');
+        const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+        const videoURL = URL.createObjectURL(videoBlob);
+
+        const video = document.createElement('video');
+        video.src = videoURL;
+        video.controls = true;
+        videoCompressionResult.innerHTML = '';
+        videoCompressionResult.appendChild(video);
+
+        const a = document.createElement('a');
+        a.href = videoURL;
+        a.download = 'compressed-video.mp4';
+        a.className = 'button';
+        a.innerText = 'Download Compressed Video';
+        videoCompressionResult.appendChild(a);
+      } catch (error) {
+        console.error('Error compressing video:', error);
+      }
     }
-    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-    requestAnimationFrame(drawVideo);
-  }
-
-  videoElement.play();
-}
-
-function displayCompressedVideo(videoUrl) {
-  videoCompressionResult.innerHTML = '';
-  const video = document.createElement('video');
-  video.src = videoUrl;
-  video.controls = true;
-  video.classList.add('video-preview');
-  videoCompressionResult.appendChild(video);
-
-  const a = document.createElement('a');
-  a.href = videoUrl;
-  a.download = 'compressed-video.webm';
-  a.className = 'button';
-  a.innerText = 'Download Compressed Video';
-  videoCompressionResult.appendChild(a);
-}
-  }
-});
-
-
+  });
 });
