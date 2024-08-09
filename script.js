@@ -404,6 +404,8 @@ async function compressVideo(file) {
     videoCompressionResult.appendChild(progressIndicator);
 
     const ffmpeg = createFFmpeg({
+      corePath: './path/to/your/custom/ffmpeg-core.js',
+      mainName: 'main',
       log: true,
       progress: ({ ratio }) => {
         progressIndicator.textContent = `Compressing: ${(ratio * 100).toFixed(2)}%`;
