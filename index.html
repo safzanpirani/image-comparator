@@ -139,6 +139,7 @@
 <body>
   <div class="container">
     <div class="tabs">
+      <button class="tab-link" data-tab="compression-video">video compression</button>
       <button class="tab-link" data-tab="comparison">image comparison</button>
       <button class="tab-link" data-tab="compression-jpg">image compression (jpg)</button>
       <button class="tab-link" data-tab="compression-png">image compression (png)</button>
@@ -146,6 +147,17 @@
       <button class="tab-link" data-tab="crop">image crop</button>
       <button class="tab-link" data-tab="flip">image flip</button>
     </div>
+
+    <div id="compression-video" class="tab-content">
+      <h1>video compression tool</h1>
+      <form id="compression-form-video">
+        <input type="file" id="video-to-compress" accept="video/*">
+        <label for="video-quality">quality (1-31, lower is better):</label>
+        <input type="number" id="video-quality" min="1" max="31" value="23">
+        <button type="button" id="compress-video" class="button button-margin">compress</button>
+      </form>
+      <div id="compression-result-video"></div>
+    </div>    
 
     <div id="flip" class="tab-content">
       <h1>image flip tool</h1>
@@ -244,6 +256,7 @@
       <div id="crop-result" class="center"></div>
     </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   <script src="script.js"></script>
 </body>
