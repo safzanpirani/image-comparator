@@ -124,6 +124,10 @@
       height: 100%;
       object-fit: contain;
     }
+    .video-preview {
+      max-width: 100%;
+      height: auto;
+    }
 
     @media (max-width: 600px) {
       .tabs {
@@ -145,7 +149,7 @@
       <button class="tab-link" data-tab="resize">Image Resize</button>
       <button class="tab-link" data-tab="crop">Image Crop</button>
       <button class="tab-link" data-tab="flip">Image Flip</button>
-      <button class="tab-link" data-tab="video-compression">Video Compression</button>
+      <button class="tab-link" data-tab="video-compression">video compression</button>
     </div>
 
     <div id="flip" class="tab-content">
@@ -249,7 +253,7 @@
       <h1>Video Compression Tool</h1>
       <form id="video-compression-form">
         <input type="file" id="video-to-compress" accept="video/*">
-        <button type="button" id="compress-video" class="button button-margin">Compress</button>
+        <button type="button" id="compress-video" class="button button-margin">Compress Video</button>
       </form>
       <div id="video-compression-result"></div>
     </div>
