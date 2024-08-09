@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Tool</title>
+  <title>image tool</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
   <style>
     body {
@@ -124,7 +124,7 @@
       height: 100%;
       object-fit: contain;
     }
-
+  
     @media (max-width: 600px) {
       .tabs {
         flex-direction: column; /* Stack tabs vertically on smaller screens */
@@ -134,84 +134,95 @@
       }
     }
   </style>
-
+  
 </head>
 <body>
   <div class="container">
     <div class="tabs">
-      <button class="tab-link" data-tab="comparison">Image Comparison</button>
-      <button class="tab-link" data-tab="compression-jpg">Image Compression (JPG)</button>
-      <button class="tab-link" data-tab="compression-png">Image Compression (PNG)</button>
-      <button class="tab-link" data-tab="resize">Image Resize</button>
-      <button class="tab-link" data-tab="crop">Image Crop</button>
-      <button class="tab-link" data-tab="flip">Image Flip</button>
-      <button class="tab-link" data-tab="video-compression">Video Compression</button>
+      <button class="tab-link" data-tab="compression-video">video compression</button>
+      <button class="tab-link" data-tab="comparison">image comparison</button>
+      <button class="tab-link" data-tab="compression-jpg">image compression (jpg)</button>
+      <button class="tab-link" data-tab="compression-png">image compression (png)</button>
+      <button class="tab-link" data-tab="resize">image resize</button>
+      <button class="tab-link" data-tab="crop">image crop</button>
+      <button class="tab-link" data-tab="flip">image flip</button>
     </div>
 
+    <div id="compression-video" class="tab-content">
+      <h1>video compression tool</h1>
+      <form id="compression-form-video">
+        <input type="file" id="video-to-compress" accept="video/*">
+        <label for="video-quality">quality (1-31, lower is better):</label>
+        <input type="number" id="video-quality" min="1" max="31" value="23">
+        <button type="button" id="compress-video" class="button button-margin">compress</button>
+      </form>
+      <div id="compression-result-video"></div>
+    </div>    
+
     <div id="flip" class="tab-content">
-      <h1>Image Flip Tool</h1>
+      <h1>image flip tool</h1>
       <form id="flip-form">
         <input type="file" id="image-to-flip" accept="image/*">
-        <label for="flip-direction">Flip Direction:</label>
+        <label for="flip-direction">flip direction:</label>
         <select id="flip-direction">
-          <option value="horizontal">Horizontal</option>
-          <option value="vertical">Vertical</option>
+          <option value="horizontal">horizontal</option>
+          <option value="vertical">vertical</option>
         </select>
-        <button type="button" id="flip-btn" class="button">Flip</button>
+        <button type="button" id="flip-btn" class="button">flip</button>
       </form>
       <div id="flip-result" class="center"></div>
     </div>
 
     <div id="comparison" class="tab-content">
-      <h1>Image Comparison Tool</h1>
+      <h1>image comparison tool</h1>
       <form id="image-form">
         <input type="file" id="image-1" accept="image/*">
         <input type="file" id="image-2" accept="image/*">
-        <button type="button" id="add-image" class="button button-margin">Add Another Image</button>
-        <button type="button" id="compare" class="button">Compare</button>
+        <button type="button" id="add-image" class="button button-margin">add another image</button>
+        <button type="button" id="compare" class="button">compare</button>
       </form>
       <div class="image-container" id="image-container"></div>
       <div class="center">
-        <button id="download" class="button" style="display: none;">Download Combined Image</button>
+        <button id="download" class="button" style="display: none;">download combined image</button>
       </div>
     </div>
 
     <div id="compression-jpg" class="tab-content">
-      <h1>Image Compression Tool (JPG)</h1>
+      <h1>image compression tool (jpg)</h1>
       <form id="compression-form-jpg">
         <input type="file" id="image-to-compress-jpg" accept="image/*">
-        <button type="button" id="compress-jpg" class="button button-margin">Compress</button>
+        <button type="button" id="compress-jpg" class="button button-margin">compress</button>
       </form>
       <div id="compression-result-jpg"></div>
     </div>
 
     <div id="compression-png" class="tab-content">
-      <h1>Image Compression Tool (PNG)</h1>
+      <h1>image compression tool (png)</h1>
       <form id="compression-form-png">
         <input type="file" id="image-to-compress-png" accept="image/*">
-        <button type="button" id="compress-png" class="button button-margin">Compress</button>
+        <button type="button" id="compress-png" class="button button-margin">compress</button>
       </form>
       <div id="compression-result-png"></div>
     </div>
 
     <div id="resize" class="tab-content">
-      <h1>Image Resize Tool</h1>
+      <h1>image resize tool</h1>
       <form id="resize-form">
         <input type="file" id="image-to-resize" accept="image/*">
         <div>
-          <label for="resize-width">Width (px):</label>
+          <label for="resize-width">width (px):</label>
           <input type="number" id="resize-width">
         </div>
         <div>
-          <label for="resize-height">Height (px):</label>
+          <label for="resize-height">height (px):</label>
           <input type="number" id="resize-height">
         </div>
         <div>
-          <label for="resize-percentage">Scale (%):</label>
+          <label for="resize-percentage">scale (%):</label>
           <input type="number" id="resize-percentage" min="0" max="400" step="1" value="100">
         </div>
         <div class="center">
-          <button type="button" id="resize-image" class="button button-margin">Resize</button>
+          <button type="button" id="resize-image" class="button button-margin">resize</button>
         </div>
       </form>
       <div id="resize-preview" class="image-container"></div>
@@ -219,14 +230,14 @@
     </div>
 
     <div id="crop" class="tab-content">
-      <h1>Image Crop Tool</h1>
+      <h1>image crop tool</h1>
       <form id="crop-form">
         <input type="file" id="image-to-crop" accept="image/*">
         <div>
-          <label for="aspect-ratio">Aspect Ratio:</label>
+          <label for="aspect-ratio">aspect ratio:</label>
           <select id="aspect-ratio">
-            <option value="free">Free</option>
-            <option value="1">1:1 (Square)</option>
+            <option value="free">free</option>
+            <option value="1">1:1 (square)</option>
             <option value="2/3">2:3</option>
             <option value="3/2">3:2</option>
             <option value="3/4">3:4</option>
@@ -238,27 +249,15 @@
           </select>
         </div>
         <div class="crop-container">
-          <img id="crop-image" src="" alt="Upload a file to preview">
+          <img id="crop-image" src="" alt="upload a file to preview">
         </div>
-        <button type="button" id="crop-btn" class="button button-margin">Crop</button>
+        <button type="button" id="crop-btn" class="button button-margin">crop</button>
       </form>
       <div id="crop-result" class="center"></div>
     </div>
 
-    <div id="video-compression" class="tab-content">
-      <h1>Video Compression Tool</h1>
-      <form id="video-compression-form">
-        <input type="file" id="video-to-compress" accept="video/*">
-        <button type="button" id="compress-video" class="button button-margin">Compress</button>
-      </form>
-      <div id="video-compression-result"></div>
-    </div>
-
-  </div>
-  
-  <script type="module" src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-  <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
-  <script src="https://unpkg.com/@ffmpeg/core-st/dist/ffmpeg-core.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
