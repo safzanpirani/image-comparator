@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('video-to-compress');
     if (input.files.length > 0) {
       const file = input.files[0];
-      const { createFFmpeg, fetchFile } = FFmpeg;
+      const { createFFmpeg, fetchFile } = ffmpeg;
       const ffmpeg = createFFmpeg({ log: true });
 
       try {
