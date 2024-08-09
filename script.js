@@ -1,9 +1,10 @@
-const { createFFmpeg, fetchFile } = FFmpeg;
+// Remove the redundant import and require statement
+// import Cropper from 'cropperjs'; // Remove this if using direct script inclusion
 
 document.addEventListener('DOMContentLoaded', () => {
   const tabLinks = document.querySelectorAll('.tab-link');
   const tabContents = document.querySelectorAll('.tab-content');
-  
+
   tabLinks.forEach(link => {
     link.addEventListener('click', (event) => {
       const tabName = event.currentTarget.getAttribute('data-tab');
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (tabLinks.length > 0) {
     tabLinks[0].click();
   }
+
 
   // Image Comparison Logic
   const form = document.getElementById('image-form');
@@ -185,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+
   // Image Compression Logic (JPG)
   const compressionFormJPG = document.getElementById('compression-form-jpg');
   const compressBtnJPG = document.getElementById('compress-jpg');
@@ -215,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
           a.href = dataURL;
           a.download = 'compressed-image.jpg';
           a.className = 'button';
-          a.innerText = 'Download Compressed Image';
+          a.innerText = 'download compressed image';
           compressionResultJPG.appendChild(a);
         };
       };
@@ -255,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
           a.href = dataURL;
           a.download = 'compressed-image.png';
           a.className = 'button';
-          a.innerText = 'Download Compressed Image';
+          a.innerText = 'download compressed image';
           compressionResultPNG.appendChild(a);
         };
       };
@@ -290,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const widthInput = document.getElementById('resize-width');
     const heightInput = document.getElementById('resize-height');
     const percentageInput = document.getElementById('resize-percentage');
-
+    
     if (input.files.length > 0) {
       const reader = new FileReader();
       reader.onload = () => {
@@ -300,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
           let width = img.width;
           let height = img.height;
           const percentage = percentageInput.value / 100;
-
+          
           if (widthInput.value) {
             width = parseInt(widthInput.value);
             height = width / img.width * img.height;
@@ -328,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
           a.href = dataURL;
           a.download = 'resized-image.png';
           a.className = 'button';
-          a.innerText = 'Download Resized Image';
+          a.innerText = 'download resized image';
           resizeResult.appendChild(a);
         };
       };
@@ -337,131 +340,52 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const flipForm = document.getElementById('flip-form');
-  const flipBtn = document.getElementById('flip-btn');
-  const flipResult = document.getElementById('flip-result');
-  const flipDirectionSelect = document.getElementById('flip-direction');
+const flipBtn = document.getElementById('flip-btn');
+const flipResult = document.getElementById('flip-result');
+const flipDirectionSelect = document.getElementById('flip-direction');
 
-  flipBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const input = document.getElementById('image-to-flip');
-    if (input.files.length > 0) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const img = new Image();
-        img.src = reader.result;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-          const flipDirection = flipDirectionSelect.value;
-          if (flipDirection === 'horizontal') {
-            ctx.translate(canvas.width, 0);
-            ctx.scale(-1, 1);
-            ctx.drawImage(img, 0, 0);
-          } else if (flipDirection === 'vertical') {
-            ctx.translate(0, canvas.height);
-            ctx.scale(1, -1);
-            ctx.drawImage(img, 0, 0);
-          }
-          const flippedDataURL = canvas.toDataURL();
-          const flippedImg = new Image();
-          flippedImg.src = flippedDataURL;
-          flippedImg.classList.add('image-preview');
-          flipResult.innerHTML = '';
-          flipResult.appendChild(flippedImg);
-
-          const a = document.createElement('a');
-          a.href = flippedDataURL;
-          a.download = 'flipped-image.png';
-          a.className = 'button';
-          a.innerText = 'Download Flipped Image';
-          flipResult.appendChild(a);
-        };
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-  });
-
-  const videoCompressionForm = document.getElementById('video-compression-form');
-const compressVideoBtn = document.getElementById('compress-video');
-const videoCompressionResult = document.getElementById('video-compression-result');
-const progressIndicator = document.createElement('p');
-
-compressVideoBtn.addEventListener('click', async (e) => {
+flipBtn.addEventListener('click', (e) => {
   e.preventDefault();
-  const input = document.getElementById('video-to-compress');
+  const input = document.getElementById('image-to-flip');
   if (input.files.length > 0) {
-    const file = input.files[0];
-    await compressVideo(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.src = reader.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const flipDirection = flipDirectionSelect.value;
+        if (flipDirection === 'horizontal') {
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(img, 0, 0);
+        } else if (flipDirection === 'vertical') {
+          ctx.translate(0, canvas.height);
+          ctx.scale(1, -1);
+          ctx.drawImage(img, 0, 0);
+        }
+        const flippedDataURL = canvas.toDataURL();
+        const flippedImg = new Image();
+        flippedImg.src = flippedDataURL;
+        flippedImg.classList.add('image-preview');
+        flipResult.innerHTML = '';
+        flipResult.appendChild(flippedImg);
+
+        const a = document.createElement('a');
+        a.href = flippedDataURL;
+        a.download = 'flipped-image.png';
+        a.className = 'button';
+        a.innerText = 'download flipped image';
+        flipResult.appendChild(a);
+      };
+    };
+    reader.readAsDataURL(input.files[0]);
   }
 });
 
-async function compressVideo(file) {
-  try {
-    progressIndicator.textContent = 'Loading FFmpeg...';
-    videoCompressionResult.appendChild(progressIndicator);
 
-    const ffmpeg = createFFmpeg({
-      corePath: './path/to/your/custom/ffmpeg-core.js',
-      mainName: 'main',
-      log: true,
-      progress: ({ ratio }) => {
-        progressIndicator.textContent = `Compressing: ${(ratio * 100).toFixed(2)}%`;
-      },
-    });
-
-    await ffmpeg.load();
-
-    progressIndicator.textContent = 'Starting compression...';
-
-    // Write the file to FFmpeg's file system
-    ffmpeg.FS('writeFile', file.name, await fetchFile(file));
-
-    // Run FFmpeg command
-    await ffmpeg.run(
-      '-i', file.name,
-      '-c:v', 'libx264',
-      '-crf', '23',
-      '-preset', 'medium',
-      '-c:a', 'aac',
-      '-b:a', '128k',
-      'output.mp4'
-    );
-
-    // Read the result
-    const data = ffmpeg.FS('readFile', 'output.mp4');
-
-    // Create a URL
-    const compressedVideoUrl = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-
-    // Display the compressed video
-    displayCompressedVideo(compressedVideoUrl);
-
-    // Clean up
-    ffmpeg.FS('unlink', file.name);
-    ffmpeg.FS('unlink', 'output.mp4');
-
-  } catch (error) {
-    console.error('Error during video compression:', error);
-    progressIndicator.textContent = 'An error occurred during compression. Please try again.';
-  }
-}
-
-function displayCompressedVideo(videoUrl) {
-  videoCompressionResult.innerHTML = '';
-  const video = document.createElement('video');
-  video.src = videoUrl;
-  video.controls = true;
-  video.classList.add('video-preview');
-  videoCompressionResult.appendChild(video);
-
-  const a = document.createElement('a');
-  a.href = videoUrl;
-  a.download = 'compressed-video.mp4';
-  a.className = 'button';
-  a.innerText = 'Download Compressed Video';
-  videoCompressionResult.appendChild(a);
-}
 });
