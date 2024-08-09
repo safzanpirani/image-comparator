@@ -1,12 +1,10 @@
-let ffmpeg;
-createFFmpeg({ log: true }).then((instance) => {
-  ffmpeg = instance;
-});
+const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({ log: true });
 
 document.addEventListener('DOMContentLoaded', () => {
   const tabLinks = document.querySelectorAll('.tab-link');
   const tabContents = document.querySelectorAll('.tab-content');
-
+  
   tabLinks.forEach(link => {
     link.addEventListener('click', (event) => {
       const tabName = event.currentTarget.getAttribute('data-tab');
@@ -389,38 +387,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Video Compression Logic
   const videoCompressionForm = document.getElementById('video-compression-form');
-  const compressVideoBtn = document.getElementById('compress-video');
-  const videoCompressionResult = document.getElementById('video-compression-result');
-  
-  compressVideoBtn.addEventListener('click', async (e) => {
-    
-    e.preventDefault();
-    const input = document.getElementById('video-to-compress');
-    if (input.files.length > 0) {
-      const file = input.files[0];
-      try {
-        await ffmpeg.load();
-        ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
-        await ffmpeg.run('-i', 'input.mp4', '-vcodec', 'libx264', '-crf', '23', 'output.mp4');
-        const data = ffmpeg.FS('readFile', 'output.mp4');
-        const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-        const videoURL = URL.createObjectURL(videoBlob);
+const compressVideoBtn = document.getElementById('compress-video');
+const videoCompressionResult = document.getElementById('video-compression-result');
 
-        const video = document.createElement('video');
-        video.src = videoURL;
-        video.controls = true;
-        videoCompressionResult.innerHTML = '';
-        videoCompressionResult.appendChild(video);
+compressVideoBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('video-to-compress');
+  if (input.files.length > 0) {
+    const file = input.files[0];
+    await compressVideo(file);
+  }
+});
 
-        const a = document.createElement('a');
-        a.href = videoURL;
-        a.download = 'compressed-video.mp4';
-        a.className = 'button';
-        a.innerText = 'Download Compressed Video';
-        videoCompressionResult.appendChild(a);
-      } catch (error) {
-        console.error('Error compressing video:', error);
-      }
+async function compressVideo(file) {
+  try {
+    // Load FFmpeg
+    if (!ffmpeg.isLoaded()) {
+      await ffmpeg.load();
     }
-  });
+
+    // Write the file to FFmpeg's file system
+    ffmpeg.FS('writeFile', file.name, await fetchFile(file));
+
+    // Run FFmpeg command
+    await ffmpeg.run(
+      '-i', file.name,
+      '-c:v', 'libx264',
+      '-crf', '23',
+      '-preset', 'medium',
+      '-c:a', 'aac',
+      '-b:a', '128k',
+      'output.mp4'
+    );
+
+    // Read the result
+    const data = ffmpeg.FS('readFile', 'output.mp4');
+
+    // Create a URL
+    const compressedVideoUrl = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+
+    // Display the compressed video
+    displayCompressedVideo(compressedVideoUrl);
+  } catch (error) {
+    console.error('Error during video compression:', error);
+    videoCompressionResult.innerHTML = 'An error occurred during compression. Please try again.';
+  }
+}
+
+function displayCompressedVideo(videoUrl) {
+  videoCompressionResult.innerHTML = '';
+  const video = document.createElement('video');
+  video.src = videoUrl;
+  video.controls = true;
+  video.classList.add('video-preview');
+  videoCompressionResult.appendChild(video);
+
+  const a = document.createElement('a');
+  a.href = videoUrl;
+  a.download = 'compressed-video.mp4';
+  a.className = 'button';
+  a.innerText = 'Download Compressed Video';
+  videoCompressionResult.appendChild(a);
+}
 });
