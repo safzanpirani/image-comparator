@@ -1,3 +1,8 @@
+let ffmpeg;
+createFFmpeg({ log: true }).then((instance) => {
+  ffmpeg = instance;
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   const tabLinks = document.querySelectorAll('.tab-link');
   const tabContents = document.querySelectorAll('.tab-content');
@@ -393,9 +398,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('video-to-compress');
     if (input.files.length > 0) {
       const file = input.files[0];
-      const { createFFmpeg, fetchFile } = ffmpeg;
-      const ffmpeg = createFFmpeg({ log: true });
-
       try {
         await ffmpeg.load();
         ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
