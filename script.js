@@ -8,10 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
   tabLinks.forEach(link => {
     link.addEventListener('click', (event) => {
       const tabName = event.currentTarget.getAttribute('data-tab');
-      openTab(event, tabName);
+      if (tabName === 'compression-video') {
+        window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+      } else {
+        openTab(event, tabName);
+      }
     });
   });
-
+  
   function openTab(evt, tabName) {
     tabContents.forEach(content => {
       content.classList.remove('active');
@@ -21,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById(tabName).classList.add('active');
     evt.currentTarget.classList.add('active');
+  }
+
+  // Open the image comparison tab by default
+  const defaultTab = document.querySelector('[data-tab="comparison"]');
+  if (defaultTab) {
+    openTab({ currentTarget: defaultTab }, 'comparison');
   }
 
   // Automatically open the first tab

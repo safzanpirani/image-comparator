@@ -139,13 +139,27 @@
 <body>
   <div class="container">
     <div class="tabs">
-      <button class="tab-link" data-tab="compression-video">video compression (does not work)</button>
+      <button class="tab-link" data-tab="compression-video">video compression (do not click, does not work)</button>
       <button class="tab-link" data-tab="comparison">image comparison</button>
       <button class="tab-link" data-tab="compression-jpg">image compression (jpg)</button>
       <button class="tab-link" data-tab="compression-png">image compression (png)</button>
       <button class="tab-link" data-tab="resize">image resize</button>
       <button class="tab-link" data-tab="crop">image crop</button>
       <button class="tab-link" data-tab="flip">image flip</button>
+    </div>
+
+    <div id="comparison" class="tab-content">
+      <h1>image comparison tool</h1>
+      <form id="image-form">
+        <input type="file" id="image-1" accept="image/*">
+        <input type="file" id="image-2" accept="image/*">
+        <button type="button" id="add-image" class="button button-margin">add another image</button>
+        <button type="button" id="compare" class="button">compare</button>
+      </form>
+      <div class="image-container" id="image-container"></div>
+      <div class="center">
+        <button id="download" class="button" style="display: none;">download combined image</button>
+      </div>
     </div>
 
     <div id="compression-video" class="tab-content">
@@ -171,20 +185,6 @@
         <button type="button" id="flip-btn" class="button">flip</button>
       </form>
       <div id="flip-result" class="center"></div>
-    </div>
-
-    <div id="comparison" class="tab-content">
-      <h1>image comparison tool</h1>
-      <form id="image-form">
-        <input type="file" id="image-1" accept="image/*">
-        <input type="file" id="image-2" accept="image/*">
-        <button type="button" id="add-image" class="button button-margin">add another image</button>
-        <button type="button" id="compare" class="button">compare</button>
-      </form>
-      <div class="image-container" id="image-container"></div>
-      <div class="center">
-        <button id="download" class="button" style="display: none;">download combined image</button>
-      </div>
     </div>
 
     <div id="compression-jpg" class="tab-content">
