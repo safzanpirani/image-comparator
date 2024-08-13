@@ -1,6 +1,8 @@
 # Image Comparator
 
-Image Comparator is a versatile web-based tool for various image manipulation tasks. It provides a user-friendly interface for comparing, compressing, resizing, cropping, and flipping images. It was made as a simple bookmark to quickly resize/crop single images for social media, or other websites that don't offer great tools for editing your image before posting on a desktop/laptop.
+Image Comparator is a versatile web-based tool for various image manipulation tasks. It provides a user-friendly interface for comparing, compressing, resizing, cropping, and flipping images. It was made as a simple bookmarkable tool to quickly edit single images for social media, or other websites that don't offer great tools for editing your image before posting on a desktop/laptop.
+
+Try it now [here!](https://imagetooler.vercel.app/)
 
 ## Features
 
