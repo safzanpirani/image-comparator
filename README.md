@@ -26,18 +26,6 @@ Try it now [here!](https://imagetooler.vercel.app/)
 4. Click the action button (e.g., "Compare", "Compress", "Resize", "Crop", "Flip").
 5. View the result and download the processed image if desired.
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
 ## Acknowledgments
 
 - [Cropper.js](https://github.com/fengyuanchen/cropperjs) for the image cropping functionality.
-
-## Notes
-
-The video compression feature is currently unavailable and will redirect to a surprise video. Stay tuned for updates!
