@@ -146,6 +146,8 @@
       <button class="tab-link" data-tab="resize">image resize</button>
       <button class="tab-link" data-tab="crop">image crop</button>
       <button class="tab-link" data-tab="flip">image flip</button>
+      <button class="tab-link" data-tab="rotate">image rotate</button>
+      <button class="tab-link" data-tab="colouradjust">image colour adjustment (wip)</button>
     </div>
 
     <div id="comparison" class="tab-content">
@@ -159,6 +161,53 @@
       <div class="image-container" id="image-container"></div>
       <div class="center">
         <button id="download" class="button" style="display: none;">download combined image</button>
+      </div>
+    </div>
+
+    <div id="colouradjust" class="tab-content">
+      <h1>image colour adjustment tool (wip)</h1>
+      <form id="color-adjustment-form">
+        <input type="file" id="image-to-adjust" accept="image/*">
+        <div>
+          <label>brightness:</label>
+          <input type="range" id="brightness-slider" min="-100" max="100" value="0">
+          <span id="brightness-value">0</span>
+        </div>
+        <div>
+          <label>contrast:</label>
+          <input type="range" id="contrast-slider" min="-100" max="100" value="0">
+          <span id="contrast-value">0</span>
+        </div>
+        <div>
+          <label>creepify:</label>
+          <input type="range" id="saturation-slider" min="-100" max="100" value="0">
+          <span id="saturation-value">0</span>
+        </div>
+        <div>
+          <label>hue:</label>
+          <input type="range" id="hue-slider" min="0" max="360" value="0">
+          <span id="hue-value">0</span>
+        </div>
+        <button id="adjust-colors-btn">apply</button>
+        <div id="color-adjustment-result"></div>
+      </form>
+      </div>
+
+    <div id="rotate" class="tab-content">
+      <h1>image rotation tool</h1>
+      <form id="rotate-form">
+        <input type="file" id="image-to-rotate" accept="image/*">
+        <select id="rotate-direction">
+          <option value="90">rotate 90° clockwise</option>
+          <option value="180">rotate 180°</option>
+          <option value="270">rotate 270° clockwise</option>
+        </select>
+        <button id="rotate-btn">rotate image</button>
+        <div id="rotate-result"></div>
+      </form>
+      <div class="image-container" id="image-container"></div>
+      <div class="center">
+        <button id="download" class="button" style="display: none;">download rotated image</button>
       </div>
     </div>
 

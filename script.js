@@ -38,6 +38,218 @@ document.addEventListener('DOMContentLoaded', () => {
     tabLinks[0].click();
   }
 
+// Image Color Adjustment Logic
+const colorAdjustmentForm = document.getElementById('color-adjustment-form');
+const adjustColorsBtn = document.getElementById('adjust-colors-btn');
+const colorAdjustmentResult = document.getElementById('color-adjustment-result');
+const brightnessSlider = document.getElementById('brightness-slider');
+const contrastSlider = document.getElementById('contrast-slider');
+const saturationSlider = document.getElementById('saturation-slider');
+const hueSlider = document.getElementById('hue-slider');
+
+// Update value labels
+brightnessSlider.addEventListener('input', () => {
+  document.getElementById('brightness-value').innerText = brightnessSlider.value;
+});
+contrastSlider.addEventListener('input', () => {
+  document.getElementById('contrast-value').innerText = contrastSlider.value;
+});
+saturationSlider.addEventListener('input', () => {
+  document.getElementById('saturation-value').innerText = saturationSlider.value;
+});
+hueSlider.addEventListener('input', () => {
+  document.getElementById('hue-value').innerText = hueSlider.value;
+});
+
+adjustColorsBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('image-to-adjust');
+  if (input.files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.src = reader.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        // Get pixel data
+        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        // Apply color adjustments
+        // Apply color adjustments
+for (let i = 0; i < pixels.data.length; i += 4) {
+  let r = pixels.data[i];
+  let g = pixels.data[i + 1];
+  let b = pixels.data[i + 2];
+
+  // Hue
+  const hue = parseInt(hueSlider.value);
+  const hsl = rgbToHsl(r, g, b);
+  hsl[0] += hue / 360;
+  if (hsl[0] > 1) hsl[0] -= 1;
+  const rgb = hslToRgb(hsl[0], hsl[1], hsl[2]);
+  r = rgb[0];
+  g = rgb[1];
+  b = rgb[2];
+
+  // Brightness
+  const brightness = parseInt(brightnessSlider.value);
+  r = Math.max(0, Math.min(255, r + brightness));
+  g = Math.max(0, Math.min(255, g + brightness));
+  b = Math.max(0, Math.min(255, b + brightness));
+
+   // Contrast
+   const contrast = parseInt(contrastSlider.value);
+   const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+   r = Math.max(0, Math.min(255, factor * (r - 128) + 128));
+   g = Math.max(0, Math.min(255, factor * (g - 128) + 128));
+   b = Math.max(0, Math.min(255, factor * (b - 128) + 128));
+ 
+   // Saturation
+   const saturation = parseInt(saturationSlider.value);
+   const max = Math.max(r, g, b);
+   const min = Math.min(r, g, b);
+   const delta = max - min;
+   if (delta !== 0) {
+     const lightness = (max + min) / 2;
+     const s = lightness > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+     const newS = s + (saturation / 100);
+     const newMax = lightness + (newS * (1 - lightness));
+     const newMin = lightness - (newS * lightness);
+     r = Math.max(0, Math.min(255, (r - min) / delta * (newMax - newMin) + newMin));
+     g = Math.max(0, Math.min(255, (g - min) / delta * (newMax - newMin) + newMin));
+     b = Math.max(0, Math.min(255, (b - min) / delta * (newMax - newMin) + newMin));
+   }
+ 
+   pixels.data[i] = r;
+   pixels.data[i + 1] = g;
+   pixels.data[i + 2] = b;
+ }
+          
+                  // Put pixel data back
+                  ctx.putImageData(pixels, 0, 0);
+          
+                  // Display adjusted image
+                  const adjustedDataURL = canvas.toDataURL();
+                  const adjustedImg = new Image();
+                  adjustedImg.src = adjustedDataURL;
+                  adjustedImg.classList.add('image-preview');
+                  colorAdjustmentResult.innerHTML = '';
+                  colorAdjustmentResult.appendChild(adjustedImg);
+          
+                  // Add download link
+                  const a = document.createElement('a');
+                  a.href = adjustedDataURL;
+                  a.download = 'adjusted-image.png';
+                  a.className = 'button';
+                  a.innerText = 'download adjusted image';
+                  colorAdjustmentResult.appendChild(a);
+                };
+              };
+              reader.readAsDataURL(input.files[0]);
+            }
+          });
+          
+          // Helper functions for color conversion
+          function rgbToHsl(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const delta = max - min;
+            let h, s, l;
+            if (delta === 0) {
+              h = 0;
+            } else if (max === r) {
+              h = (g - b) / delta;
+            } else if (max === g) {
+              h = 2 + (b - r) / delta;
+            } else {
+              h = 4 + (r - g) / delta;
+            }
+            h *= 60;
+            if (h < 0) h += 360;
+            l = (max + min) / 2;
+            s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+            return [h / 360, s, l];
+          }
+          
+          function hslToRgb(h, s, l) {
+            let r, g, b;
+            if (s === 0) {
+              r = g = b = l;
+            } else {
+              const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+              const p = 2 * l - q;
+              r = hueToRgb(p, q, h + 1/3);
+              g = hueToRgb(p, q, h);
+              b = hueToRgb(p, q, h - 1/3);
+            }
+            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+          }
+          
+          function hueToRgb(p, q, t) {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * 6 * (2/3 - t);
+            return p;
+          }
+          
+
+
+const rotateForm = document.getElementById('rotate-form');
+const rotateBtn = document.getElementById('rotate-btn');
+const rotateResult = document.getElementById('rotate-result');
+const rotateDirectionSelect = document.getElementById('rotate-direction');
+
+rotateBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('image-to-rotate');
+  if (input.files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.src = reader.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const rotation = parseInt(rotateDirectionSelect.value);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(rotation * Math.PI / 180);
+        ctx.translate(-canvas.width / 2, -canvas.height / 2);
+        ctx.drawImage(img, 0, 0);
+        ctx.restore();
+        const rotatedDataURL = canvas.toDataURL();
+        const rotatedImg = new Image();
+        rotatedImg.src = rotatedDataURL;
+        rotatedImg.classList.add('image-preview');
+        rotateResult.innerHTML = '';
+        rotateResult.appendChild(rotatedImg);
+
+        const a = document.createElement('a');
+        a.href = rotatedDataURL;
+        a.download = 'rotated-image.png';
+        a.className = 'button';
+        a.innerText = 'download rotated image';
+        rotateResult.appendChild(a);
+      };
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+});
+
 
   // Image Comparison Logic
   const form = document.getElementById('image-form');
