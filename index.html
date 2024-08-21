@@ -58,10 +58,26 @@
       max-width: 100%;
       height: auto;
     }
+    .result-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .result-container img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .button-container {
+      margin-top: 20px;
+    }
+
+    /* Consistent styling for all download buttons */
     .button {
       display: inline-block;
       padding: 10px 20px;
-      margin-top: 10px;
       background-color: #4CAF50;
       color: white;
       text-decoration: none;
@@ -124,7 +140,7 @@
       height: 100%;
       object-fit: contain;
     }
-  
+
     @media (max-width: 600px) {
       .tabs {
         flex-direction: column; /* Stack tabs vertically on smaller screens */
@@ -134,7 +150,7 @@
       }
     }
   </style>
-  
+
 </head>
 <body>
   <div class="container">
@@ -193,23 +209,29 @@
       </form>
       </div>
 
-    <div id="rotate" class="tab-content">
-      <h1>image rotation tool</h1>
-      <form id="rotate-form">
-        <input type="file" id="image-to-rotate" accept="image/*">
-        <select id="rotate-direction">
-          <option value="90">rotate 90° clockwise</option>
-          <option value="180">rotate 180°</option>
-          <option value="270">rotate 270° clockwise</option>
-        </select>
-        <button id="rotate-btn">rotate image</button>
-        <div id="rotate-result"></div>
-      </form>
-      <div class="image-container" id="image-container"></div>
-      <div class="center">
-        <button id="download" class="button" style="display: none;">download rotated image</button>
+      <div id="rotate" class="tab-content">
+        <h1>image rotation tool</h1>
+        <form id="rotate-form">
+          <input type="file" id="image-to-rotate" accept="image/*">
+          <div>
+            <label for="rotate-angle">angle (in degrees):</label>
+            <input type="number" id="rotate-angle" min="0" max="360" value="0">
+          </div>
+          <div>
+            <input type="range" id="rotate-slider" min="0" max="360" value="0">
+          </div> <div>
+            <button type="button" data-rotate="90">90°</button>
+            <button type="button" data-rotate="180">180°</button>
+            <button type="button" data-rotate="270">270°</button>
+          </div>
+          <button id="rotate-btn">Rotate Image</button>
+          <div id="rotate-result"></div>
+        </form>
+        <div class="image-container" id="image-container"></div>
+        <div class="center">
+          <button id="download" class="button" style="display: none;">download rotated image</button>
+        </div>
       </div>
-    </div>
 
     <div id="compression-video" class="tab-content">
       <h1>video compression tool (out of order)</h1>
@@ -220,7 +242,7 @@
         <button type="button" id="compress-video" class="button button-margin">compress</button>
       </form>
       <div id="compression-result-video"></div>
-    </div>    
+    </div>
 
     <div id="flip" class="tab-content">
       <h1>image flip tool</h1>
@@ -275,7 +297,7 @@
         </div>
       </form>
       <div id="resize-preview" class="image-container"></div>
-      <div id="resize-result" class="center"></div>
+      <div id="resize-result" class="result-container"></div>
     </div>
 
     <div id="crop" class="tab-content">
