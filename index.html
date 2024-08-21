@@ -276,6 +276,19 @@
       <h1>image compression tool (png)</h1>
       <form id="compression-form-png">
         <input type="file" id="image-to-compress-png" accept="image/*">
+        <div>
+          <label for="png-resize-factor">resize factor (%):</label>
+          <input type="range" id="png-resize-factor" min="10" max="100" value="70">
+          <span id="png-resize-value">70%</span>
+        </div>
+        <div>
+          <label for="png-color-quality">color quality:</label>
+          <select id="png-color-quality">
+            <option value="high">high (24-bit)</option>
+            <option value="medium">medium (16-bit)</option>
+            <option value="low">low (8-bit)</option>
+          </select>
+        </div>
         <button type="button" id="compress-png" class="button button-margin">compress</button>
       </form>
       <div id="compression-result-png"></div>

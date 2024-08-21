@@ -259,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
           a.href = dataURL;
           a.download = "compressed-image.jpg";
           a.className = "button";
-          a.innerText = "Download Compressed Image";
+          a.innerText = "download compressed image";
 
           // Wrap the button in a container div
           const buttonContainer = document.createElement("div");
@@ -270,6 +270,17 @@ document.addEventListener("DOMContentLoaded", () => {
           compressionResultJPG.innerHTML = "";
           compressionResultJPG.appendChild(compressedImg);
           compressionResultJPG.appendChild(buttonContainer);
+
+          // Display compression info
+          const originalSize = new Blob([reader.result]).size;
+          const compressedSize = new Blob([dataURL]).size;
+          const compressionRatio = (
+            (1 - compressedSize / originalSize) *
+            100
+          ).toFixed(2);
+          const infoText = document.createElement("p");
+          infoText.textContent = `original size: ${(originalSize / 1024).toFixed(2)}KB, compressed size: ${(compressedSize / 1024).toFixed(2)}KB, compression ratio: ${compressionRatio}%`;
+          compressionResultJPG.appendChild(infoText);
         };
       };
       reader.readAsDataURL(input.files[0]);
@@ -282,6 +293,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const compressionResultPNG = document.getElementById(
     "compression-result-png",
   );
+  const pngResizeFactor = document.getElementById("png-resize-factor");
+  const pngResizeValue = document.getElementById("png-resize-value");
+  const pngColorQuality = document.getElementById("png-color-quality");
+
+  pngResizeFactor.addEventListener("input", () => {
+    pngResizeValue.textContent = `${pngResizeFactor.value}%`;
+  });
 
   compressBtnPNG.addEventListener("click", (e) => {
     e.preventDefault();
@@ -294,12 +312,22 @@ document.addEventListener("DOMContentLoaded", () => {
         img.onload = () => {
           const canvas = document.createElement("canvas");
           const ctx = canvas.getContext("2d");
-          // Reduce the dimensions of the image
-          const scale = 0.7; // adjust the scale factor as needed
+          const scale = parseInt(pngResizeFactor.value) / 100;
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const dataURL = canvas.toDataURL("image/png"); // adjust compression quality here
+
+          // Apply color quantization
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const quality = pngColorQuality.value;
+          if (quality === "medium") {
+            applyColorQuantization(imageData.data, 16);
+          } else if (quality === "low") {
+            applyColorQuantization(imageData.data, 8);
+          }
+          ctx.putImageData(imageData, 0, 0);
+
+          const dataURL = canvas.toDataURL("image/png");
           const compressedImg = new Image();
           compressedImg.src = dataURL;
           compressedImg.classList.add("image-preview");
@@ -312,20 +340,38 @@ document.addEventListener("DOMContentLoaded", () => {
           a.className = "button";
           a.innerText = "download compressed image";
 
-          // Wrap the button in a container div
           const buttonContainer = document.createElement("div");
           buttonContainer.classList.add("button-container");
           buttonContainer.appendChild(a);
 
-          // Append the container to the result div
           compressionResultPNG.innerHTML = "";
           compressionResultPNG.appendChild(compressedImg);
           compressionResultPNG.appendChild(buttonContainer);
+
+          // Display compression info
+          const originalSize = new Blob([reader.result]).size;
+          const compressedSize = new Blob([dataURL]).size;
+          const compressionRatio = (
+            (1 - compressedSize / originalSize) *
+            100
+          ).toFixed(2);
+          const infoText = document.createElement("p");
+          infoText.textContent = `original size: ${(originalSize / 1024).toFixed(2)}KB, compressed size: ${(compressedSize / 1024).toFixed(2)}KB, compression ratio: ${compressionRatio}%`;
+          compressionResultPNG.appendChild(infoText);
         };
       };
       reader.readAsDataURL(input.files[0]);
     }
   });
+
+  function applyColorQuantization(data, bits) {
+    const factor = 256 / (1 << bits);
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = Math.floor(data[i] / factor) * factor;
+      data[i + 1] = Math.floor(data[i + 1] / factor) * factor;
+      data[i + 2] = Math.floor(data[i + 2] / factor) * factor;
+    }
+  }
 
   // Resize Logic
   const resizeForm = document.getElementById("resize-form");
