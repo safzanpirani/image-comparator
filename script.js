@@ -217,6 +217,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const compressionResultJPG = document.getElementById(
     "compression-result-jpg",
   );
+  const jpgQualitySlider = document.getElementById("jpg-quality-slider");
+  const jpgQualityInput = document.getElementById("jpg-quality-input");
+
+  // Sync slider and input
+  jpgQualitySlider.addEventListener("input", () => {
+    jpgQualityInput.value = jpgQualitySlider.value;
+  });
+
+  jpgQualityInput.addEventListener("input", () => {
+    let value = parseInt(jpgQualityInput.value);
+    if (value < 1) value = 1;
+    if (value > 100) value = 100;
+    jpgQualityInput.value = value;
+    jpgQualitySlider.value = value;
+  });
 
   compressBtnJPG.addEventListener("click", (e) => {
     e.preventDefault();
@@ -232,7 +247,8 @@ document.addEventListener("DOMContentLoaded", () => {
           canvas.width = img.width;
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0, img.width, img.height);
-          const dataURL = canvas.toDataURL("image/jpeg", 0.7); // adjust compression quality here
+          const quality = parseInt(jpgQualityInput.value) / 100;
+          const dataURL = canvas.toDataURL("image/jpeg", quality);
           const compressedImg = new Image();
           compressedImg.src = dataURL;
           compressedImg.classList.add("image-preview");
@@ -243,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
           a.href = dataURL;
           a.download = "compressed-image.jpg";
           a.className = "button";
-          a.innerText = "download compressed image";
+          a.innerText = "Download Compressed Image";
 
           // Wrap the button in a container div
           const buttonContainer = document.createElement("div");

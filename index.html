@@ -262,6 +262,11 @@
       <h1>image compression tool (jpg)</h1>
       <form id="compression-form-jpg">
         <input type="file" id="image-to-compress-jpg" accept="image/*">
+        <div>
+          <label for="jpg-quality">compression quality (%):</label>
+          <input type="range" id="jpg-quality-slider" min="1" max="100" value="70">
+          <input type="number" id="jpg-quality-input" min="1" max="100" value="70">
+        </div>
         <button type="button" id="compress-jpg" class="button button-margin">compress</button>
       </form>
       <div id="compression-result-jpg"></div>
