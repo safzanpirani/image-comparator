@@ -141,6 +141,10 @@
       object-fit: contain;
     }
 
+    .color-quality-container {
+      margin-bottom: 10px;
+    }
+
     @media (max-width: 600px) {
       .tabs {
         flex-direction: column; /* Stack tabs vertically on smaller screens */
@@ -281,7 +285,7 @@
           <input type="range" id="png-resize-factor" min="10" max="100" value="70">
           <span id="png-resize-value">70%</span>
         </div>
-        <div>
+        <div class="color-quality-container">
           <label for="png-color-quality">color quality:</label>
           <select id="png-color-quality">
             <option value="high">high (24-bit)</option>
