@@ -460,12 +460,16 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const flipForm = document.getElementById("flip-form");
-  const flipBtn = document.getElementById("flip-btn");
   const flipResult = document.getElementById("flip-result");
   const flipDirectionSelect = document.getElementById("flip-direction");
 
-  flipBtn.addEventListener("click", (e) => {
-    e.preventDefault();
+  flipDirectionSelect.addEventListener("change", updateFlippedImage);
+
+  document
+    .getElementById("image-to-flip")
+    .addEventListener("change", updateFlippedImage);
+
+  function updateFlippedImage() {
     const input = document.getElementById("image-to-flip");
     if (input.files.length > 0) {
       const reader = new FileReader();
@@ -473,97 +477,89 @@ document.addEventListener("DOMContentLoaded", () => {
         const img = new Image();
         img.src = reader.result;
         img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-          const flipDirection = flipDirectionSelect.value;
-          if (flipDirection === "horizontal") {
-            ctx.translate(canvas.width, 0);
-            ctx.scale(-1, 1);
-            ctx.drawImage(img, 0, 0);
-          } else if (flipDirection === "vertical") {
-            ctx.translate(0, canvas.height);
-            ctx.scale(1, -1);
-            ctx.drawImage(img, 0, 0);
-          }
-          const flippedDataURL = canvas.toDataURL();
-
-          const flipResult = document.getElementById("flip-result");
-          flipResult.innerHTML = "";
-
-          const resultContainer = document.createElement("div");
-          resultContainer.classList.add("result-container");
-
-          const flippedImg = new Image();
-          flippedImg.src = flippedDataURL;
-          flippedImg.classList.add("image-preview");
-          resultContainer.appendChild(flippedImg);
-
-          const buttonContainer = document.createElement("div");
-          buttonContainer.classList.add("button-container");
-
-          const a = document.createElement("a");
-          a.href = flippedDataURL;
-          a.download = "flipped-image.png";
-          a.className = "button";
-          a.innerText = "download flipped image";
-
-          buttonContainer.appendChild(a);
-          resultContainer.appendChild(buttonContainer);
-
-          flipResult.appendChild(resultContainer);
+          flipImage(img, flipDirectionSelect.value);
         };
       };
       reader.readAsDataURL(input.files[0]);
     }
-  });
+  }
+
+  function flipImage(img, flipDirection) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    if (flipDirection === "horizontal") {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    } else if (flipDirection === "vertical") {
+      ctx.translate(0, canvas.height);
+      ctx.scale(1, -1);
+    }
+
+    ctx.drawImage(img, 0, 0);
+
+    const flippedDataURL = canvas.toDataURL();
+    const flippedImg = new Image();
+    flippedImg.src = flippedDataURL;
+    flippedImg.classList.add("image-preview");
+    flipResult.innerHTML = "";
+    flipResult.appendChild(flippedImg);
+
+    // Add download link
+    const a = document.createElement("a");
+    a.href = flippedDataURL;
+    a.download = "flipped-image.png";
+    a.className = "button";
+    a.innerText = "download flipped image";
+
+    // Wrap the button in a container div
+    const buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("button-container");
+    buttonContainer.appendChild(a);
+
+    // Append the container to the result div
+    flipResult.appendChild(buttonContainer);
+  }
+
+  // Initial update
+  updateFlippedImage();
 
   // Rotate Logic
   const rotateForm = document.getElementById("rotate-form");
   const rotateBtn = document.getElementById("rotate-btn");
   const rotateResult = document.getElementById("rotate-result");
-  const rotateSlider = document.getElementById("rotate-slider");
   const rotateAngleInput = document.getElementById("rotate-angle");
-  const rotateValue = document.getElementById("rotate-value");
 
   // Prevent form submission for image rotation
   rotateForm.addEventListener("submit", (e) => {
     e.preventDefault();
   });
 
-  // Event listener for slider
-  rotateSlider.addEventListener("input", () => {
-    const angle = parseInt(rotateSlider.value);
-    rotateValue.textContent = `${angle}°`;
-    rotateAngleInput.value = angle;
-  });
-
   // Event listener for angle input
   rotateAngleInput.addEventListener("input", () => {
-    const angle = parseInt(rotateAngleInput.value);
+    let angle = parseInt(rotateAngleInput.value);
     // Keep angle value within 0-360 range
-    if (angle < 0) {
-      rotateAngleInput.value = 0;
-    } else if (angle > 360) {
-      rotateAngleInput.value = 360;
-    }
-    rotateSlider.value = rotateAngleInput.value;
-    rotateValue.textContent = `${rotateAngleInput.value}°`;
+    if (isNaN(angle)) angle = 0;
+    if (angle < 0) angle = 0;
+    if (angle > 360) angle = 360;
+    rotateAngleInput.value = angle;
+    updateRotatedImage();
   });
 
   // Event listeners for preset buttons
-  rotateForm.querySelectorAll("button[data-rotate]").forEach((button) => {
-    button.addEventListener("click", () => {
-      rotateSlider.value = parseInt(button.dataset.rotate);
-      rotateValue.textContent = `${rotateSlider.value}°`;
-      rotateAngleInput.value = rotateSlider.value; // Update the angle input field as well
+  rotateForm
+    .querySelectorAll("button[type='button'][data-rotate]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const angle = parseInt(button.dataset.rotate);
+        rotateAngleInput.value = angle;
+        updateRotatedImage();
+      });
     });
-  });
 
-  rotateBtn.addEventListener("click", (e) => {
-    e.preventDefault();
+  function updateRotatedImage() {
     const input = document.getElementById("image-to-rotate");
     if (input.files.length > 0) {
       const reader = new FileReader();
@@ -571,49 +567,64 @@ document.addEventListener("DOMContentLoaded", () => {
         const img = new Image();
         img.src = reader.result;
         img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          const rotation = parseInt(rotateAngleInput.value);
-
-          // Calculate canvas dimensions to accommodate rotated image
-          const radians = (rotation * Math.PI) / 180;
-          const sin = Math.abs(Math.sin(radians));
-          const cos = Math.abs(Math.cos(radians));
-          canvas.width = img.width * cos + img.height * sin;
-          canvas.height = img.width * sin + img.height * cos;
-
-          // Rotate around the center
-          ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.rotate(radians);
-          ctx.drawImage(img, -img.width / 2, -img.height / 2);
-
-          const rotatedDataURL = canvas.toDataURL();
-          const rotatedImg = new Image();
-          rotatedImg.src = rotatedDataURL;
-          rotatedImg.classList.add("image-preview");
-          rotateResult.innerHTML = "";
-          rotateResult.appendChild(rotatedImg);
-
-          const a = document.createElement("a");
-          a.href = rotatedDataURL;
-          a.download = "rotated-image.png";
-          a.className = "button";
-          a.innerText = "download rotated image";
-
-          // Wrap the button in a container div
-          const buttonContainer = document.createElement("div");
-          buttonContainer.classList.add("button-container");
-          buttonContainer.appendChild(a);
-
-          // Append the container to the result div
-          rotateResult.innerHTML = "";
-          rotateResult.appendChild(rotatedImg);
-          rotateResult.appendChild(buttonContainer);
+          rotateImage(img, parseInt(rotateAngleInput.value));
         };
       };
       reader.readAsDataURL(input.files[0]);
     }
+  }
+
+  function rotateImage(img, rotation) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    // Calculate canvas dimensions to accommodate rotated image
+    const radians = (rotation * Math.PI) / 180;
+    const sin = Math.abs(Math.sin(radians));
+    const cos = Math.abs(Math.cos(radians));
+    canvas.width = img.width * cos + img.height * sin;
+    canvas.height = img.width * sin + img.height * cos;
+
+    // Rotate around the center
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(radians);
+    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+    const rotatedDataURL = canvas.toDataURL();
+    const rotatedImg = new Image();
+    rotatedImg.src = rotatedDataURL;
+    rotatedImg.classList.add("image-preview");
+    rotateResult.innerHTML = "";
+    rotateResult.appendChild(rotatedImg);
+
+    // Add download link
+    const a = document.createElement("a");
+    a.href = rotatedDataURL;
+    a.download = "rotated-image.png";
+    a.className = "button";
+    a.innerText = "download rotated image";
+
+    // Wrap the button in a container div
+    const buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("button-container");
+    buttonContainer.appendChild(a);
+
+    // Append the container to the result div
+    rotateResult.appendChild(buttonContainer);
+  }
+
+  rotateBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    updateRotatedImage();
   });
+
+  // Add event listener for file input change
+  document
+    .getElementById("image-to-rotate")
+    .addEventListener("change", updateRotatedImage);
+
+  // Initial update
+  updateRotatedImage();
 
   // Image Color Adjustment Logic
   const colorAdjustmentForm = document.getElementById("color-adjustment-form");
