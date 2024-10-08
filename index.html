@@ -145,6 +145,11 @@
       margin-bottom: 10px;
     }
 
+    #curves-canvas {
+      border: 1px solid #ccc;
+      margin: 10px 0;
+    }
+
     @media (max-width: 600px) {
       .tabs {
         flex-direction: column; /* Stack tabs vertically on smaller screens */
@@ -169,6 +174,29 @@
       <button class="tab-link" data-tab="flip">image flip</button>
       <button class="tab-link" data-tab="rotate">image rotate</button>
       <button class="tab-link" data-tab="colouradjust">image colour adjustment (wip)</button>
+      <button class="tab-link" data-tab="colorcurves">color curves</button>
+    </div>
+
+    <div id="colorcurves" class="tab-content">
+      <h1>color curves adjustment</h1>
+      <form id="color-curves-form">
+        <input type="file" id="image-for-curves" accept="image/*">
+        <div>
+          <canvas id="curves-canvas" width="256" height="256"></canvas>
+        </div>
+        <div>
+          <label for="curve-type">curve type:</label>
+          <select id="curve-type">
+            <option value="rgb">rgb</option>
+            <option value="r">red</option>
+            <option value="g">green</option>
+            <option value="b">blue</option>
+          </select>
+        </div>
+        <button type="button" id="apply-curves" class="button">apply curve</button>
+        <button type="button" id="reset-curves" class="button">reset curve</button>
+      </form>
+      <div id="curves-result"></div>
     </div>
 
     <div id="comparison" class="tab-content">

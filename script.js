@@ -811,4 +811,155 @@ document.addEventListener("DOMContentLoaded", () => {
     if (t < 2 / 3) return p + (q - p) * 6 * (2 / 3 - t);
     return p;
   }
+
+  const colorCurvesForm = document.getElementById("color-curves-form");
+  const curvesCanvas = document.getElementById("curves-canvas");
+  const ctx = curvesCanvas.getContext("2d");
+  const curveType = document.getElementById("curve-type");
+  const applyCurvesBtn = document.getElementById("apply-curves");
+  const resetCurvesBtn = document.getElementById("reset-curves");
+  const curvesResult = document.getElementById("curves-result");
+
+  let points = [
+    [0, 0],
+    [255, 255],
+  ];
+
+  function drawCurve() {
+    ctx.clearRect(0, 0, 256, 256);
+    ctx.beginPath();
+    ctx.moveTo(0, 255); // Start from bottom-left
+
+    for (let i = 0; i < points.length; i++) {
+      ctx.lineTo(points[i][0], 255 - points[i][1]); // Invert Y-axis for drawing
+    }
+
+    ctx.lineTo(255, 0); // End at top-right
+    ctx.strokeStyle = "#000";
+    ctx.stroke();
+
+    points.forEach((point) => {
+      ctx.beginPath();
+      ctx.arc(point[0], 255 - point[1], 4, 0, Math.PI * 2); // Invert Y-axis for points
+      ctx.fillStyle = "#f00";
+      ctx.fill();
+    });
+  }
+
+  curvesCanvas.addEventListener("mousedown", (e) => {
+    const rect = curvesCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = 255 - (e.clientY - rect.top); // Invert Y-axis
+
+    for (let i = 0; i < points.length; i++) {
+      if (Math.abs(points[i][0] - x) < 5 && Math.abs(points[i][1] - y) < 5) {
+        isDragging = true;
+        dragIndex = i;
+        return;
+      }
+    }
+
+    points.push([x, y]);
+    points.sort((a, b) => a[0] - b[0]);
+    drawCurve();
+  });
+
+  curvesCanvas.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+
+    const rect = curvesCanvas.getBoundingClientRect();
+    const x = Math.max(0, Math.min(255, e.clientX - rect.left));
+    const y = Math.max(0, Math.min(255, 255 - (e.clientY - rect.top))); // Invert Y-axis
+
+    points[dragIndex] = [x, y];
+    drawCurve();
+  });
+
+  curvesCanvas.addEventListener("mouseup", () => {
+    isDragging = false;
+    dragIndex = -1;
+  });
+
+  resetCurvesBtn.addEventListener("click", () => {
+    points = [
+      [0, 0],
+      [255, 255],
+    ];
+    drawCurve();
+  });
+
+  applyCurvesBtn.addEventListener("click", () => {
+    const input = document.getElementById("image-for-curves");
+    if (input.files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+
+          const lookupTable = new Uint8Array(256);
+          for (let i = 0; i < 256; i++) {
+            let j = 0;
+            while (j < points.length - 1 && points[j + 1][0] < i) j++;
+            const t = (i - points[j][0]) / (points[j + 1][0] - points[j][0]);
+            lookupTable[i] = Math.round(
+              (1 - t) * points[j][1] + t * points[j + 1][1],
+            );
+          }
+
+          for (let i = 0; i < data.length; i += 4) {
+            if (curveType.value === "rgb" || curveType.value === "r") {
+              data[i] = lookupTable[data[i]];
+            }
+            if (curveType.value === "rgb" || curveType.value === "g") {
+              data[i + 1] = lookupTable[data[i + 1]];
+            }
+            if (curveType.value === "rgb" || curveType.value === "b") {
+              data[i + 2] = lookupTable[data[i + 2]];
+            }
+          }
+
+          ctx.putImageData(imageData, 0, 0);
+
+          const adjustedDataURL = canvas.toDataURL();
+          const adjustedImg = new Image();
+          adjustedImg.src = adjustedDataURL;
+          adjustedImg.classList.add("image-preview");
+          curvesResult.innerHTML = "";
+          curvesResult.appendChild(adjustedImg);
+
+          const a = document.createElement("a");
+          a.href = adjustedDataURL;
+          a.download = "curves-adjusted-image.png";
+          a.className = "button";
+          a.innerText = "download adjusted image";
+
+          const buttonContainer = document.createElement("div");
+          buttonContainer.classList.add("button-container");
+          buttonContainer.appendChild(a);
+
+          curvesResult.appendChild(buttonContainer);
+        };
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  });
+
+  drawCurve();
+
+  document.getElementById("image-for-curves").addEventListener("change", () => {
+    points = [
+      [0, 0],
+      [255, 255],
+    ];
+    drawCurve();
+  });
 });
