@@ -71,8 +71,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const splitPdfForm = document.getElementById("split-pdf-form");
   const splitPdfBtn = document.getElementById("split-pdf-btn");
   const splitPdfResult = document.getElementById("split-pdf-result");
+  const mergeSplitPdfsDiv = document.getElementById("merge-split-pdfs");
+  const mergeSplitPdfsBtn = document.getElementById("merge-split-pdfs-btn");
   const splitMethod = document.getElementById("split-method");
   const pageRangeInput = document.getElementById("page-range-input");
+
+  let splitPdfUrls = []; // Array to store split PDF URLs
 
   splitMethod.addEventListener("change", () => {
     pageRangeInput.style.display =
@@ -95,52 +99,86 @@ document.addEventListener("DOMContentLoaded", () => {
     let pagesToExtract = [];
 
     if (splitMethod.value === "all") {
-      pagesToExtract = Array.from({ length: pageCount }, (_, i) => i);
+      pagesToExtract = Array.from({ length: pageCount }, (_, i) => [i]);
     } else {
       const pageRange = document.getElementById("page-range").value;
       pagesToExtract = parsePageRange(pageRange, pageCount);
     }
 
-    const splitPdfs = [];
-
-    for (const pageIndex of pagesToExtract) {
-      const newPdf = await PDFLib.PDFDocument.create();
-      const [copiedPage] = await newPdf.copyPages(pdf, [pageIndex]);
-      newPdf.addPage(copiedPage);
-      const pdfBytes = await newPdf.save();
-      splitPdfs.push(pdfBytes);
-    }
-
     splitPdfResult.innerHTML = "<p>PDF split successfully!</p>";
+    splitPdfUrls = []; // Clear previous split URLs
 
-    splitPdfs.forEach((pdfBytes, index) => {
+    for (const range of pagesToExtract) {
+      const newPdf = await PDFLib.PDFDocument.create();
+      const copiedPages = await newPdf.copyPages(pdf, range);
+      copiedPages.forEach((page) => newPdf.addPage(page));
+
+      const pdfBytes = await newPdf.save();
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
+
+      const rangeText =
+        range.length > 1
+          ? `${range[0] + 1}-${range[range.length - 1] + 1}`
+          : `${range[0] + 1}`;
+      splitPdfUrls.push(url); // Store the URL of each split PDF
       splitPdfResult.innerHTML += `
-        <a href="${url}" download="split_page_${pagesToExtract[index] + 1}.pdf" class="button">download page ${pagesToExtract[index] + 1}</a>
-      `;
-    });
+            <a href="${url}" download="split_pages_${rangeText}.pdf" class="button">download pages ${rangeText}</a>
+          `;
+    }
+
+    // Show the merge button after splitting
+    mergeSplitPdfsDiv.style.display = "block";
+  });
+
+  mergeSplitPdfsBtn.addEventListener("click", async () => {
+    if (splitPdfUrls.length < 2) {
+      alert("please split a PDF into at least two parts before merging.");
+      return;
+    }
+
+    const mergedPdf = await PDFLib.PDFDocument.create();
+
+    for (const url of splitPdfUrls) {
+      const pdfBytes = await fetch(url).then((res) => res.arrayBuffer());
+      const pdf = await PDFLib.PDFDocument.load(pdfBytes);
+      const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+      copiedPages.forEach((page) => mergedPdf.addPage(page));
+    }
+
+    const pdfBytes = await mergedPdf.save();
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+
+    splitPdfResult.innerHTML += `
+      <p>Split PDFs merged successfully!</p>
+      <a href="${url}" download="merged_split_pdfs.pdf" class="button">download merged split PDFs</a>
+    `;
   });
 
   function parsePageRange(range, pageCount) {
-    const pages = new Set();
+    const ranges = [];
     const parts = range.split(",");
 
     for (const part of parts) {
       if (part.includes("-")) {
         const [start, end] = part.split("-").map(Number);
-        for (let i = start; i <= end && i <= pageCount; i++) {
-          pages.add(i - 1);
+        const rangeArray = [];
+        for (let i = start - 1; i < end && i < pageCount; i++) {
+          rangeArray.push(i);
+        }
+        if (rangeArray.length > 0) {
+          ranges.push(rangeArray);
         }
       } else {
-        const page = Number(part);
-        if (page <= pageCount) {
-          pages.add(page - 1);
+        const page = Number(part) - 1;
+        if (page < pageCount) {
+          ranges.push([page]);
         }
       }
     }
 
-    return Array.from(pages).sort((a, b) => a - b);
+    return ranges;
   }
 
   function readFileAsArrayBuffer(file) {
