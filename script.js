@@ -35,43 +35,153 @@ document.addEventListener("DOMContentLoaded", () => {
     tabLinks[0].click();
   }
 
+  const mergePdfForm = document.getElementById("merge-pdf-form");
+  const mergePdfBtn = document.getElementById("merge-pdf-btn");
+  const mergePdfResult = document.getElementById("merge-pdf-result");
+
+  mergePdfBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const pdfFiles = document.getElementById("pdf-files").files;
+
+    if (pdfFiles.length < 2) {
+      alert("please select at least two PDF files to merge.");
+      return;
+    }
+
+    const mergedPdf = await PDFLib.PDFDocument.create();
+
+    for (const pdfFile of pdfFiles) {
+      const pdfBytes = await readFileAsArrayBuffer(pdfFile);
+      const pdf = await PDFLib.PDFDocument.load(pdfBytes);
+      const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+      copiedPages.forEach((page) => mergedPdf.addPage(page));
+    }
+
+    const pdfBytes = await mergedPdf.save();
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+
+    mergePdfResult.innerHTML = `
+      <p>PDFs merged successfully!</p>
+      <a href="${url}" download="merged.pdf" class="button">download merged PDF</a>
+    `;
+  });
+
+  // PDF Split functionality
+  const splitPdfForm = document.getElementById("split-pdf-form");
+  const splitPdfBtn = document.getElementById("split-pdf-btn");
+  const splitPdfResult = document.getElementById("split-pdf-result");
+  const splitMethod = document.getElementById("split-method");
+  const pageRangeInput = document.getElementById("page-range-input");
+
+  splitMethod.addEventListener("change", () => {
+    pageRangeInput.style.display =
+      splitMethod.value === "range" ? "block" : "none";
+  });
+
+  splitPdfBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const pdfFile = document.getElementById("pdf-to-split").files[0];
+
+    if (!pdfFile) {
+      alert("please select a PDF file to split.");
+      return;
+    }
+
+    const pdfBytes = await readFileAsArrayBuffer(pdfFile);
+    const pdf = await PDFLib.PDFDocument.load(pdfBytes);
+    const pageCount = pdf.getPageCount();
+
+    let pagesToExtract = [];
+
+    if (splitMethod.value === "all") {
+      pagesToExtract = Array.from({ length: pageCount }, (_, i) => i);
+    } else {
+      const pageRange = document.getElementById("page-range").value;
+      pagesToExtract = parsePageRange(pageRange, pageCount);
+    }
+
+    const splitPdfs = [];
+
+    for (const pageIndex of pagesToExtract) {
+      const newPdf = await PDFLib.PDFDocument.create();
+      const [copiedPage] = await newPdf.copyPages(pdf, [pageIndex]);
+      newPdf.addPage(copiedPage);
+      const pdfBytes = await newPdf.save();
+      splitPdfs.push(pdfBytes);
+    }
+
+    splitPdfResult.innerHTML = "<p>PDF split successfully!</p>";
+
+    splitPdfs.forEach((pdfBytes, index) => {
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      splitPdfResult.innerHTML += `
+        <a href="${url}" download="split_page_${pagesToExtract[index] + 1}.pdf" class="button">download page ${pagesToExtract[index] + 1}</a>
+      `;
+    });
+  });
+
+  function parsePageRange(range, pageCount) {
+    const pages = new Set();
+    const parts = range.split(",");
+
+    for (const part of parts) {
+      if (part.includes("-")) {
+        const [start, end] = part.split("-").map(Number);
+        for (let i = start; i <= end && i <= pageCount; i++) {
+          pages.add(i - 1);
+        }
+      } else {
+        const page = Number(part);
+        if (page <= pageCount) {
+          pages.add(page - 1);
+        }
+      }
+    }
+
+    return Array.from(pages).sort((a, b) => a - b);
+  }
+
+  function readFileAsArrayBuffer(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
   // Image Comparison Logic
   const form = document.getElementById("image-form");
   const imageContainer = document.getElementById("image-container");
-  const addImageBtn = document.getElementById("add-image");
   const compareBtn = document.getElementById("compare");
   const downloadBtn = document.getElementById("download");
   let images = [];
-  let imageInputs = [];
-
-  addImageBtn.addEventListener("click", () => {
-    const newInput = document.createElement("input");
-    newInput.type = "file";
-    newInput.accept = "image/*";
-    form.insertBefore(newInput, compareBtn);
-    imageInputs.push(newInput);
-  });
 
   compareBtn.addEventListener("click", (e) => {
     e.preventDefault();
     images = [];
 
-    imageInputs = document.querySelectorAll('#image-form input[type="file"]');
+    const imageFiles = document.getElementById("image-files").files;
 
-    imageInputs.forEach((input) => {
-      if (input.files.length > 0) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const img = new Image();
-          img.src = reader.result;
-          img.classList.add("image-preview");
-          images.push(img);
-          if (images.length === imageInputs.length) {
-            displayImages();
-          }
-        };
-        reader.readAsDataURL(input.files[0]);
-      }
+    if (imageFiles.length < 2) {
+      alert("please select at least two images to compare.");
+      return;
+    }
+
+    Array.from(imageFiles).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.classList.add("image-preview");
+        images.push(img);
+        if (images.length === imageFiles.length) {
+          displayImages();
+        }
+      };
+      reader.readAsDataURL(file);
     });
   });
 
@@ -457,6 +567,70 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       reader.readAsDataURL(input.files[0]);
     }
+  });
+
+  const metadataForm = document.getElementById("metadata-form");
+  const metadataDisplay = document.getElementById("metadata-display");
+  const metadataEdit = document.getElementById("metadata-edit");
+  const metadataEditForm = document.getElementById("metadata-edit-form");
+  const saveMetadataBtn = document.getElementById("save-metadata");
+
+  document
+    .getElementById("image-for-metadata")
+    .addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        EXIF.getData(file, function () {
+          const allMetadata = EXIF.getAllTags(this);
+          displayMetadata(allMetadata);
+        });
+      }
+    });
+
+  function displayMetadata(metadata) {
+    metadataDisplay.innerHTML = "<h2>image metadata</h2>";
+    metadataEditForm.innerHTML = "";
+
+    for (const [key, value] of Object.entries(metadata)) {
+      if (typeof value !== "object" && value !== undefined) {
+        metadataDisplay.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+
+        // Add editable fields for common EXIF tags
+        if (
+          ["Make", "Model", "DateTimeOriginal", "Copyright", "Artist"].includes(
+            key,
+          )
+        ) {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.id = `edit-${key}`;
+          input.value = value;
+          const label = document.createElement("label");
+          label.htmlFor = `edit-${key}`;
+          label.textContent = key;
+          metadataEditForm.appendChild(label);
+          metadataEditForm.appendChild(input);
+          metadataEditForm.appendChild(document.createElement("br"));
+        }
+      }
+    }
+
+    metadataEdit.style.display = "block";
+  }
+
+  saveMetadataBtn.addEventListener("click", () => {
+    // in a real-world scenario, you would update the image file's metadata here.
+    // however, web browsers don't allow direct modification of image files for security reasons.
+    // instead, we'll just display what would be saved.
+    let updatedMetadata = {};
+    metadataEditForm.querySelectorAll("input").forEach((input) => {
+      updatedMetadata[input.id.replace("edit-", "")] = input.value;
+    });
+
+    alert(
+      "Metadata would be updated with these values:\n" +
+        JSON.stringify(updatedMetadata, null, 2),
+    );
   });
 
   const flipForm = document.getElementById("flip-form");
