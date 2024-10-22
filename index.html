@@ -24,6 +24,7 @@
                 gap: 10px;
                 margin-bottom: 20px;
             }
+
             .tabs button {
                 padding: 10px 20px;
                 cursor: pointer;
@@ -32,9 +33,11 @@
                 border-radius: 5px;
                 transition: background-color 0.3s;
             }
+
             .tabs button:hover {
                 background-color: #ccc;
             }
+
             .tabs button.active {
                 background-color: #bbb;
                 font-weight: bold;
@@ -208,11 +211,14 @@
             }
             @media (max-width: 768px) {
                 .tabs {
-                    flex-direction: column;
-                    align-items: stretch;
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 10px;
                 }
+
                 .tabs button {
-                    margin-bottom: 5px;
+                    width: 100%;
+                    margin-bottom: 0;
                 }
             }
 
