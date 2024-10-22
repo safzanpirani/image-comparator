@@ -5,11 +5,63 @@ document.addEventListener("DOMContentLoaded", () => {
   tabLinks.forEach((link) => {
     link.addEventListener("click", (event) => {
       const tabName = event.currentTarget.getAttribute("data-tab");
-      if (tabName === "compression-video") {
-        window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank"); // Example: Opens a new tab
-      } else {
-        openTab(event, tabName);
-      }
+      openTab(event, tabName);
+    });
+  });
+
+  function setupDragAndDrop() {
+    const fileInputs = document.querySelectorAll(".file-input");
+
+    fileInputs.forEach((fileInput) => {
+      const wrapper = fileInput.closest(".file-input-wrapper");
+
+      wrapper.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        wrapper.classList.add("dragover");
+      });
+
+      wrapper.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        wrapper.classList.remove("dragover");
+      });
+
+      wrapper.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        wrapper.classList.remove("dragover");
+
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+          updateFileInputLabel(fileInput);
+
+          // Trigger change event to update preview if needed
+          const changeEvent = new Event("change");
+          fileInput.dispatchEvent(changeEvent);
+        }
+      });
+    });
+  }
+
+  const fileInput = document.getElementById("image-files");
+  const fileLabel = document.getElementById("file-label");
+
+  fileInput.addEventListener("change", (event) => {
+    const files = event.target.files;
+    if (files.length > 0) {
+      fileLabel.textContent =
+        files.length > 1 ? `${files.length} files selected` : files[0].name;
+    } else {
+      fileLabel.textContent = "No files chosen";
+    }
+  });
+  setupDragAndDrop();
+
+  // Update all file input change listeners to use updateFileInputLabel
+  document.querySelectorAll(".file-input").forEach((fileInput) => {
+    fileInput.addEventListener("change", () => {
+      updateFileInputLabel(fileInput);
     });
   });
 
@@ -35,6 +87,37 @@ document.addEventListener("DOMContentLoaded", () => {
     tabLinks[0].click();
   }
 
+  // Setup custom file inputs
+  function setupCustomFileInputs() {
+    const fileInputs = document.querySelectorAll(".file-input");
+
+    fileInputs.forEach((fileInput) => {
+      const wrapper = fileInput.closest(".file-input-wrapper");
+      const button = wrapper.querySelector(".file-input-button");
+      const label = wrapper.querySelector(".file-input-label");
+
+      button.addEventListener("click", () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+          if (fileInput.multiple) {
+            label.textContent = `${fileInput.files.length} file(s) selected`;
+          } else {
+            label.textContent = fileInput.files[0].name;
+          }
+        } else {
+          label.textContent = "No file chosen";
+        }
+      });
+    });
+  }
+
+  // Call the setup function
+  setupCustomFileInputs();
+
+  // PDF Merge functionality
   const mergePdfForm = document.getElementById("merge-pdf-form");
   const mergePdfBtn = document.getElementById("merge-pdf-btn");
   const mergePdfResult = document.getElementById("merge-pdf-result");
@@ -44,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const pdfFiles = document.getElementById("pdf-files").files;
 
     if (pdfFiles.length < 2) {
-      alert("please select at least two PDF files to merge.");
+      alert("Please select at least two PDF files to merge.");
       return;
     }
 
@@ -71,10 +154,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const splitPdfForm = document.getElementById("split-pdf-form");
   const splitPdfBtn = document.getElementById("split-pdf-btn");
   const splitPdfResult = document.getElementById("split-pdf-result");
-  const mergeSplitPdfsDiv = document.getElementById("merge-split-pdfs");
-  const mergeSplitPdfsBtn = document.getElementById("merge-split-pdfs-btn");
   const splitMethod = document.getElementById("split-method");
   const pageRangeInput = document.getElementById("page-range-input");
+  const mergeSplitPdfsDiv = document.getElementById("merge-split-pdfs");
+  const mergeSplitPdfsBtn = document.getElementById("merge-split-pdfs-btn");
 
   let splitPdfUrls = []; // Array to store split PDF URLs
 
@@ -85,10 +168,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   splitPdfBtn.addEventListener("click", async (e) => {
     e.preventDefault();
-    const pdfFile = document.getElementById("pdf-to-split").files[0];
+    const pdfFileInput = document.getElementById("pdf-to-split");
+    const pdfFile = pdfFileInput.files[0];
 
     if (!pdfFile) {
-      alert("please select a PDF file to split.");
+      alert("Please select a PDF file to split.");
       return;
     }
 
@@ -117,14 +201,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
 
+      splitPdfUrls.push(url); // Store the URL of each split PDF
+
       const rangeText =
         range.length > 1
           ? `${range[0] + 1}-${range[range.length - 1] + 1}`
           : `${range[0] + 1}`;
-      splitPdfUrls.push(url); // Store the URL of each split PDF
       splitPdfResult.innerHTML += `
-            <a href="${url}" download="split_pages_${rangeText}.pdf" class="button">download pages ${rangeText}</a>
-          `;
+        <a href="${url}" download="split_pages_${rangeText}.pdf" class="button">download pages ${rangeText}</a>
+      `;
     }
 
     // Show the merge button after splitting
@@ -133,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   mergeSplitPdfsBtn.addEventListener("click", async () => {
     if (splitPdfUrls.length < 2) {
-      alert("please split a PDF into at least two parts before merging.");
+      alert("Please split a PDF into at least two parts before merging.");
       return;
     }
 
@@ -204,7 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const imageFiles = document.getElementById("image-files").files;
 
     if (imageFiles.length < 2) {
-      alert("please select at least two images to compare.");
+      alert("Please select at least two images to compare.");
       return;
     }
 
@@ -293,7 +378,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   cropForm.addEventListener("change", (e) => {
     const input = e.target;
-    if (input.files.length > 0) {
+    if (input.id === "image-to-crop" && input.files.length > 0) {
       const reader = new FileReader();
       reader.onload = () => {
         cropImage.src = reader.result;
@@ -312,14 +397,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         cropper = new Cropper(cropImage, {
           aspectRatio: aspectRatio,
-          crop: (event) => {
-            console.log(
-              event.detail.x,
-              event.detail.y,
-              event.detail.width,
-              event.detail.height,
-            );
-          },
+          viewMode: 1,
+          minCropBoxWidth: 100,
+          minCropBoxHeight: 100,
         });
       };
       reader.readAsDataURL(input.files[0]);
@@ -409,17 +489,14 @@ document.addEventListener("DOMContentLoaded", () => {
           a.className = "button";
           a.innerText = "download compressed image";
 
-          // Wrap the button in a container div
           const buttonContainer = document.createElement("div");
           buttonContainer.classList.add("button-container");
           buttonContainer.appendChild(a);
 
-          // Append the container to the result div
           compressionResultJPG.innerHTML = "";
           compressionResultJPG.appendChild(compressedImg);
           compressionResultJPG.appendChild(buttonContainer);
 
-          // Display compression info
           const originalSize = new Blob([reader.result]).size;
           const compressedSize = new Blob([dataURL]).size;
           const compressionRatio = (
@@ -427,7 +504,7 @@ document.addEventListener("DOMContentLoaded", () => {
             100
           ).toFixed(2);
           const infoText = document.createElement("p");
-          infoText.textContent = `original size: ${(originalSize / 1024).toFixed(2)}KB, compressed size: ${(compressedSize / 1024).toFixed(2)}KB, compression ratio: ${compressionRatio}%`;
+          infoText.textContent = `Original size: ${(originalSize / 1024).toFixed(2)}KB, Compressed size: ${(compressedSize / 1024).toFixed(2)}KB, Compression ratio: ${compressionRatio}%`;
           compressionResultJPG.appendChild(infoText);
         };
       };
@@ -465,7 +542,6 @@ document.addEventListener("DOMContentLoaded", () => {
           canvas.height = img.height * scale;
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          // Apply color quantization
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const quality = pngColorQuality.value;
           if (quality === "medium") {
@@ -496,7 +572,6 @@ document.addEventListener("DOMContentLoaded", () => {
           compressionResultPNG.appendChild(compressedImg);
           compressionResultPNG.appendChild(buttonContainer);
 
-          // Display compression info
           const originalSize = new Blob([reader.result]).size;
           const compressedSize = new Blob([dataURL]).size;
           const compressionRatio = (
@@ -504,7 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
             100
           ).toFixed(2);
           const infoText = document.createElement("p");
-          infoText.textContent = `original size: ${(originalSize / 1024).toFixed(2)}KB, compressed size: ${(compressedSize / 1024).toFixed(2)}KB, compression ratio: ${compressionRatio}%`;
+          infoText.textContent = `Original size: ${(originalSize / 1024).toFixed(2)}KB, Compressed size: ${(compressedSize / 1024).toFixed(2)}KB, Compression ratio: ${compressionRatio}%`;
           compressionResultPNG.appendChild(infoText);
         };
       };
@@ -575,7 +650,7 @@ document.addEventListener("DOMContentLoaded", () => {
           canvas.width = width;
           canvas.height = height;
           ctx.drawImage(img, 0, 0, width, height);
-          const dataURL = canvas.toDataURL("image/png"); // Output resized image as PNG
+          const dataURL = canvas.toDataURL("image/png");
 
           const resizeResult = document.getElementById("resize-result");
           resizeResult.innerHTML = "";
@@ -607,70 +682,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  const metadataForm = document.getElementById("metadata-form");
-  const metadataDisplay = document.getElementById("metadata-display");
-  const metadataEdit = document.getElementById("metadata-edit");
-  const metadataEditForm = document.getElementById("metadata-edit-form");
-  const saveMetadataBtn = document.getElementById("save-metadata");
-
-  document
-    .getElementById("image-for-metadata")
-    .addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        EXIF.getData(file, function () {
-          const allMetadata = EXIF.getAllTags(this);
-          displayMetadata(allMetadata);
-        });
-      }
-    });
-
-  function displayMetadata(metadata) {
-    metadataDisplay.innerHTML = "<h2>image metadata</h2>";
-    metadataEditForm.innerHTML = "";
-
-    for (const [key, value] of Object.entries(metadata)) {
-      if (typeof value !== "object" && value !== undefined) {
-        metadataDisplay.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
-
-        // Add editable fields for common EXIF tags
-        if (
-          ["Make", "Model", "DateTimeOriginal", "Copyright", "Artist"].includes(
-            key,
-          )
-        ) {
-          const input = document.createElement("input");
-          input.type = "text";
-          input.id = `edit-${key}`;
-          input.value = value;
-          const label = document.createElement("label");
-          label.htmlFor = `edit-${key}`;
-          label.textContent = key;
-          metadataEditForm.appendChild(label);
-          metadataEditForm.appendChild(input);
-          metadataEditForm.appendChild(document.createElement("br"));
-        }
-      }
-    }
-
-    metadataEdit.style.display = "block";
-  }
-
-  saveMetadataBtn.addEventListener("click", () => {
-    // in a real-world scenario, you would update the image file's metadata here.
-    // however, web browsers don't allow direct modification of image files for security reasons.
-    // instead, we'll just display what would be saved.
-    let updatedMetadata = {};
-    metadataEditForm.querySelectorAll("input").forEach((input) => {
-      updatedMetadata[input.id.replace("edit-", "")] = input.value;
-    });
-
-    alert(
-      "Metadata would be updated with these values:\n" +
-        JSON.stringify(updatedMetadata, null, 2),
-    );
-  });
-
+  // Flip Logic
   const flipForm = document.getElementById("flip-form");
   const flipResult = document.getElementById("flip-result");
   const flipDirectionSelect = document.getElementById("flip-direction");
@@ -719,24 +731,18 @@ document.addEventListener("DOMContentLoaded", () => {
     flipResult.innerHTML = "";
     flipResult.appendChild(flippedImg);
 
-    // Add download link
     const a = document.createElement("a");
     a.href = flippedDataURL;
     a.download = "flipped-image.png";
     a.className = "button";
     a.innerText = "download flipped image";
 
-    // Wrap the button in a container div
     const buttonContainer = document.createElement("div");
     buttonContainer.classList.add("button-container");
     buttonContainer.appendChild(a);
 
-    // Append the container to the result div
     flipResult.appendChild(buttonContainer);
   }
-
-  // Initial update
-  updateFlippedImage();
 
   // Rotate Logic
   const rotateForm = document.getElementById("rotate-form");
@@ -744,15 +750,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const rotateResult = document.getElementById("rotate-result");
   const rotateAngleInput = document.getElementById("rotate-angle");
 
-  // Prevent form submission for image rotation
   rotateForm.addEventListener("submit", (e) => {
     e.preventDefault();
   });
 
-  // Event listener for angle input
   rotateAngleInput.addEventListener("input", () => {
     let angle = parseInt(rotateAngleInput.value);
-    // Keep angle value within 0-360 range
     if (isNaN(angle)) angle = 0;
     if (angle < 0) angle = 0;
     if (angle > 360) angle = 360;
@@ -760,7 +763,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateRotatedImage();
   });
 
-  // Event listeners for preset buttons
   rotateForm
     .querySelectorAll("button[type='button'][data-rotate]")
     .forEach((button) => {
@@ -790,14 +792,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    // Calculate canvas dimensions to accommodate rotated image
     const radians = (rotation * Math.PI) / 180;
     const sin = Math.abs(Math.sin(radians));
     const cos = Math.abs(Math.cos(radians));
     canvas.width = img.width * cos + img.height * sin;
     canvas.height = img.width * sin + img.height * cos;
 
-    // Rotate around the center
     ctx.translate(canvas.width / 2, canvas.height / 2);
     ctx.rotate(radians);
     ctx.drawImage(img, -img.width / 2, -img.height / 2);
@@ -809,19 +809,16 @@ document.addEventListener("DOMContentLoaded", () => {
     rotateResult.innerHTML = "";
     rotateResult.appendChild(rotatedImg);
 
-    // Add download link
     const a = document.createElement("a");
     a.href = rotatedDataURL;
     a.download = "rotated-image.png";
     a.className = "button";
     a.innerText = "download rotated image";
 
-    // Wrap the button in a container div
     const buttonContainer = document.createElement("div");
     buttonContainer.classList.add("button-container");
     buttonContainer.appendChild(a);
 
-    // Append the container to the result div
     rotateResult.appendChild(buttonContainer);
   }
 
@@ -830,15 +827,10 @@ document.addEventListener("DOMContentLoaded", () => {
     updateRotatedImage();
   });
 
-  // Add event listener for file input change
   document
     .getElementById("image-to-rotate")
     .addEventListener("change", updateRotatedImage);
-
-  // Initial update
-  updateRotatedImage();
-
-  // Image Color Adjustment Logic
+  // Color Adjustment Logic
   const colorAdjustmentForm = document.getElementById("color-adjustment-form");
   const adjustColorsBtn = document.getElementById("adjust-colors-btn");
   const colorAdjustmentResult = document.getElementById(
@@ -849,7 +841,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const saturationSlider = document.getElementById("saturation-slider");
   const hueSlider = document.getElementById("hue-slider");
 
-  // Update value labels
   brightnessSlider.addEventListener("input", () => {
     document.getElementById("brightness-value").innerText =
       brightnessSlider.value;
@@ -880,16 +871,13 @@ document.addEventListener("DOMContentLoaded", () => {
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0);
 
-          // Get pixel data
           const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-          // Apply color adjustments
           for (let i = 0; i < pixels.data.length; i += 4) {
             let r = pixels.data[i];
             let g = pixels.data[i + 1];
             let b = pixels.data[i + 2];
 
-            // Hue
             const hue = parseInt(hueSlider.value);
             const hsl = rgbToHsl(r, g, b);
             hsl[0] += hue / 360;
@@ -899,20 +887,17 @@ document.addEventListener("DOMContentLoaded", () => {
             g = rgb[1];
             b = rgb[2];
 
-            // Brightness
             const brightness = parseInt(brightnessSlider.value);
             r = Math.max(0, Math.min(255, r + brightness));
             g = Math.max(0, Math.min(255, g + brightness));
             b = Math.max(0, Math.min(255, b + brightness));
 
-            // Contrast
             const contrast = parseInt(contrastSlider.value);
             const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
             r = Math.max(0, Math.min(255, factor * (r - 128) + 128));
             g = Math.max(0, Math.min(255, factor * (g - 128) + 128));
             b = Math.max(0, Math.min(255, factor * (b - 128) + 128));
 
-            // Saturation
             const saturation = parseInt(saturationSlider.value);
             const max = Math.max(r, g, b);
             const min = Math.min(r, g, b);
@@ -943,10 +928,8 @@ document.addEventListener("DOMContentLoaded", () => {
             pixels.data[i + 2] = b;
           }
 
-          // Put pixel data back
           ctx.putImageData(pixels, 0, 0);
 
-          // Display adjusted image
           const adjustedDataURL = canvas.toDataURL();
           const adjustedImg = new Image();
           adjustedImg.src = adjustedDataURL;
@@ -954,21 +937,16 @@ document.addEventListener("DOMContentLoaded", () => {
           colorAdjustmentResult.innerHTML = "";
           colorAdjustmentResult.appendChild(adjustedImg);
 
-          // Add download link
           const a = document.createElement("a");
           a.href = adjustedDataURL;
           a.download = "adjusted-image.png";
           a.className = "button";
           a.innerText = "download adjusted image";
 
-          // Wrap the button in a container div
           const buttonContainer = document.createElement("div");
           buttonContainer.classList.add("button-container");
           buttonContainer.appendChild(a);
 
-          // Append the container to the result div
-          colorAdjustmentResult.innerHTML = "";
-          colorAdjustmentResult.appendChild(adjustedImg);
           colorAdjustmentResult.appendChild(buttonContainer);
         };
       };
@@ -976,7 +954,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Helper functions for color conversion
   function rgbToHsl(r, g, b) {
     r /= 255;
     g /= 255;
@@ -1024,6 +1001,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return p;
   }
 
+  // Color Curves Logic
   const colorCurvesForm = document.getElementById("color-curves-form");
   const curvesCanvas = document.getElementById("curves-canvas");
   const ctx = curvesCanvas.getContext("2d");
@@ -1036,23 +1014,25 @@ document.addEventListener("DOMContentLoaded", () => {
     [0, 0],
     [255, 255],
   ];
+  let isDragging = false;
+  let dragIndex = -1;
 
   function drawCurve() {
     ctx.clearRect(0, 0, 256, 256);
     ctx.beginPath();
-    ctx.moveTo(0, 255); // Start from bottom-left
+    ctx.moveTo(0, 255);
 
     for (let i = 0; i < points.length; i++) {
-      ctx.lineTo(points[i][0], 255 - points[i][1]); // Invert Y-axis for drawing
+      ctx.lineTo(points[i][0], 255 - points[i][1]);
     }
 
-    ctx.lineTo(255, 0); // End at top-right
+    ctx.lineTo(255, 0);
     ctx.strokeStyle = "#000";
     ctx.stroke();
 
     points.forEach((point) => {
       ctx.beginPath();
-      ctx.arc(point[0], 255 - point[1], 4, 0, Math.PI * 2); // Invert Y-axis for points
+      ctx.arc(point[0], 255 - point[1], 4, 0, Math.PI * 2);
       ctx.fillStyle = "#f00";
       ctx.fill();
     });
@@ -1061,7 +1041,7 @@ document.addEventListener("DOMContentLoaded", () => {
   curvesCanvas.addEventListener("mousedown", (e) => {
     const rect = curvesCanvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    const y = 255 - (e.clientY - rect.top); // Invert Y-axis
+    const y = 255 - (e.clientY - rect.top);
 
     for (let i = 0; i < points.length; i++) {
       if (Math.abs(points[i][0] - x) < 5 && Math.abs(points[i][1] - y) < 5) {
@@ -1081,7 +1061,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const rect = curvesCanvas.getBoundingClientRect();
     const x = Math.max(0, Math.min(255, e.clientX - rect.left));
-    const y = Math.max(0, Math.min(255, 255 - (e.clientY - rect.top))); // Invert Y-axis
+    const y = Math.max(0, Math.min(255, 255 - (e.clientY - rect.top)));
 
     points[dragIndex] = [x, y];
     drawCurve();
@@ -1173,5 +1153,66 @@ document.addEventListener("DOMContentLoaded", () => {
       [255, 255],
     ];
     drawCurve();
+  });
+
+  // Metadata Logic
+  const metadataForm = document.getElementById("metadata-form");
+  const metadataDisplay = document.getElementById("metadata-display");
+  const metadataEdit = document.getElementById("metadata-edit");
+  const metadataEditForm = document.getElementById("metadata-edit-form");
+  const saveMetadataBtn = document.getElementById("save-metadata");
+
+  document
+    .getElementById("image-for-metadata")
+    .addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        EXIF.getData(file, function () {
+          const allMetadata = EXIF.getAllTags(this);
+          displayMetadata(allMetadata);
+        });
+      }
+    });
+
+  function displayMetadata(metadata) {
+    metadataDisplay.innerHTML = "<h2>Image Metadata</h2>";
+    metadataEditForm.innerHTML = "";
+
+    for (const [key, value] of Object.entries(metadata)) {
+      if (typeof value !== "object" && value !== undefined) {
+        metadataDisplay.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+
+        if (
+          ["Make", "Model", "DateTimeOriginal", "Copyright", "Artist"].includes(
+            key,
+          )
+        ) {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.id = `edit-${key}`;
+          input.value = value;
+          const label = document.createElement("label");
+          label.htmlFor = `edit-${key}`;
+          label.textContent = key;
+          metadataEditForm.appendChild(label);
+          metadataEditForm.appendChild(input);
+          metadataEditForm.appendChild(document.createElement("br"));
+        }
+      }
+    }
+
+    metadataEdit.style.display = "block";
+  }
+
+  saveMetadataBtn.addEventListener("click", () => {
+    let updatedMetadata = {};
+    metadataEditForm.querySelectorAll("input").forEach((input) => {
+      updatedMetadata[input.id.replace("edit-", "")] = input.value;
+    });
+
+    alert(
+      "Metadata would be updated with these values:\n" +
+        JSON.stringify(updatedMetadata, null, 2),
+    );
   });
 });

@@ -1,473 +1,745 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>image tool</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-    }
-    .container {
-      max-width: 800px;
-      margin: 40px auto;
-      text-align: center;
-    }
-    .tabs {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;  /* This adds space between buttons */
-      margin-bottom: 20px;
-    }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>image tool</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"
+        />
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+            }
+            .container {
+                max-width: 800px;
+                margin: 40px auto;
+                text-align: center;
+            }
+            .tabs {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            .tabs button {
+                padding: 10px 20px;
+                cursor: pointer;
+                border: none;
+                background-color: #ddd;
+                border-radius: 5px;
+                transition: background-color 0.3s;
+            }
+            .tabs button:hover {
+                background-color: #ccc;
+            }
+            .tabs button.active {
+                background-color: #bbb;
+                font-weight: bold;
+            }
+            .tab-content {
+                display: none;
+            }
+            .tab-content.active {
+                display: block;
+            }
+            .image-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-wrap: nowrap;
+            }
+            .image-container img {
+                width: 50%;
+                height: auto;
+                display: inline-block;
+                margin: 0;
+                padding: 0;
+                border: 0;
+            }
+            form {
+                margin-bottom: 20px;
+            }
+            form input,
+            form select,
+            form button {
+                margin: 10px 0;
+            }
+            input[type="file"] {
+                margin: 20px 0;
+            }
+            #compression-result img {
+                max-width: 100%;
+                height: auto;
+            }
+            .result-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .result-container img {
+                max-width: 100%;
+                height: auto;
+                margin-bottom: 20px;
+            }
+            .button-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                justify-content: center;
+                margin: 20px 0;
+            }
+            .button {
+                display: inline-block;
+                padding: 10px 20px;
+                margin: 10px 5px;
+                background-color: #4caf50;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                cursor: pointer;
+                border: none;
+                transition: background-color 0.3s;
+            }
+            .button:hover {
+                background-color: #45a049;
+            }
+            .button-margin {
+                margin-bottom: 20px;
+            }
+            .center {
+                display: flex;
+                justify-content: center;
+            }
+            .image-preview {
+                max-width: 100%;
+                height: auto;
+            }
+            #resize-form div {
+                margin: 10px 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            #resize-form label {
+                margin-right: 10px;
+            }
+            #resize {
+                text-align: center;
+            }
+            #resize-form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            #resize-form label,
+            #resize-form input {
+                margin: 5px;
+            }
+            .crop-container {
+                width: 50%;
+                height: 50vh;
+                margin: 20px auto;
+                border: 1px solid #ddd;
+                overflow: hidden;
+            }
+            #crop-image {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+            .color-quality-container {
+                margin-bottom: 10px;
+            }
+            #curves-canvas {
+                border: 1px solid #ccc;
+                margin: 10px 0;
+            }
+            #metadata-display,
+            #metadata-edit {
+                margin-top: 20px;
+            }
+            #metadata-edit-form label {
+                display: inline-block;
+                width: 150px;
+                margin-right: 10px;
+            }
+            #metadata-edit-form input {
+                margin-bottom: 10px;
+            }
+            .file-input-wrapper {
+                position: relative;
+                display: inline-block;
+                margin-bottom: 10px;
+                padding: 20px;
+                border: 2px dashed #ccc;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+            }
 
-    .tabs button {
-      padding: 10px 20px;
-      cursor: pointer;
-      border: none;
-      background-color: #ddd;
-      border-radius: 5px;  /* Optional: adds rounded corners */
-      transition: background-color 0.3s;  /* Optional: smooth color transition on hover */
-    }
+            .file-input-wrapper.dragover {
+                background-color: #f0f0f0;
+                border-color: #999;
+            }
 
-    .tabs button:hover {
-      background-color: #ccc;  /* Optional: darker shade on hover */
-    }
+            .file-input-wrapper::after {
+                content: "drag and drop files here";
+                display: block;
+                margin-top: 10px;
+                font-size: 14px;
+                color: #999;
+            }
+            .file-input {
+                position: absolute;
+                left: -9999px;
+            }
+            .file-input-button {
+                display: inline-block;
+                padding: 6px 12px;
+                cursor: pointer;
+                background-color: #f0f0f0;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+            .file-input-label {
+                margin-left: 10px;
+            }
+            @media (max-width: 768px) {
+                .tabs {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+                .tabs button {
+                    margin-bottom: 5px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="tabs">
+                <button class="tab-link" data-tab="comparison">
+                    image comparison
+                </button>
+                <button class="tab-link" data-tab="compression-jpg">
+                    image compression (jpg)
+                </button>
+                <button class="tab-link" data-tab="compression-png">
+                    image compression (png)
+                </button>
+                <button class="tab-link" data-tab="resize">image resize</button>
+                <button class="tab-link" data-tab="crop">image crop</button>
+                <button class="tab-link" data-tab="flip">image flip</button>
+                <button class="tab-link" data-tab="rotate">image rotate</button>
+                <button class="tab-link" data-tab="colouradjust">
+                    image colour adjustment (wip)
+                </button>
+                <button class="tab-link" data-tab="colorcurves">
+                    color curves
+                </button>
+                <button class="tab-link" data-tab="metadata">
+                    image metadata
+                </button>
+                <button class="tab-link" data-tab="merge-pdf">merge PDF</button>
+                <button class="tab-link" data-tab="split-pdf">split PDF</button>
+            </div>
 
-    .tabs button.active {
-      background-color: #bbb;
-      font-weight: bold;  /* Optional: make active tab more prominent */
-    }
+            <div id="merge-pdf" class="tab-content">
+                <h1>merge PDF tool</h1>
+                <form id="merge-pdf-form">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="pdf-files"
+                            accept=".pdf"
+                            multiple
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose PDFs
+                        </button>
+                        <span class="file-input-label">no files chosen</span>
+                    </div>
+                    <button type="button" id="merge-pdf-btn" class="button">
+                        merge PDFs
+                    </button>
+                </form>
+                <div id="merge-pdf-result"></div>
+            </div>
 
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .image-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: nowrap;
-    }
-    .image-container img {
-      width: 50%;
-      height: auto;
-      display: inline-block;
-      margin: 0;
-      padding: 0;
-      border: 0;
-    }
-    form {
-      margin-bottom: 20px;
-    }
+            <div id="split-pdf" class="tab-content">
+                <h1>split PDF tool</h1>
+                <form id="split-pdf-form">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="pdf-to-split"
+                            accept=".pdf"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose PDF
+                        </button>
+                        <span class="file-input-label">no file chosen</span>
+                    </div>
+                    <div>
+                        <label for="split-method">split method:</label>
+                        <select id="split-method">
+                            <option value="all">split all pages</option>
+                            <option value="range">split by page range</option>
+                        </select>
+                    </div>
+                    <div id="page-range-input" style="display: none">
+                        <label for="page-range"
+                            >page range (e.g., 1-3,5,7-9):</label
+                        >
+                        <input type="text" id="page-range" />
+                    </div>
+                    <button type="button" id="split-pdf-btn" class="button">
+                        split PDF
+                    </button>
+                </form>
+                <div id="split-pdf-result"></div>
+                <div id="merge-split-pdfs" style="display: none">
+                    <button id="merge-split-pdfs-btn" class="button">
+                        Merge Split PDFs
+                    </button>
+                </div>
+            </div>
 
-    form input,
-    form select,
-    form button {
-      margin: 10px 0;
-    }
-    input[type="file"] {
-      margin: 20px 0;
-    }
-    #compression-result img {
-      max-width: 100%;
-      height: auto;
-    }
-    .result-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+            <div id="metadata" class="tab-content">
+                <h1>image metadata viewer/editor</h1>
+                <form id="metadata-form">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-for-metadata"
+                            accept="image/*"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose image
+                        </button>
+                        <span class="file-input-label">no file chosen</span>
+                    </div>
+                </form>
+                <div id="metadata-display"></div>
+                <div id="metadata-edit" style="display: none">
+                    <h2>edit metadata</h2>
+                    <form id="metadata-edit-form">
+                        <!-- Editable fields will be dynamically added here -->
+                    </form>
+                    <button id="save-metadata" class="button">
+                        save metadata
+                    </button>
+                </div>
+            </div>
 
-    .result-container img {
-      max-width: 100%;
-      height: auto;
-      margin-bottom: 20px;
-    }
+            <div id="colorcurves" class="tab-content">
+                <h1>color curves adjustment</h1>
+                <form id="color-curves-form">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-for-curves"
+                            accept="image/*"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose image
+                        </button>
+                        <span class="file-input-label">no file chosen</span>
+                    </div>
+                    <div>
+                        <canvas
+                            id="curves-canvas"
+                            width="256"
+                            height="256"
+                        ></canvas>
+                    </div>
+                    <div>
+                        <label for="curve-type">curve type:</label>
+                        <select id="curve-type">
+                            <option value="rgb">rgb</option>
+                            <option value="r">red</option>
+                            <option value="g">green</option>
+                            <option value="b">blue</option>
+                        </select>
+                    </div>
+                    <button type="button" id="apply-curves" class="button">
+                        apply curve
+                    </button>
+                    <button type="button" id="reset-curves" class="button">
+                        reset curve
+                    </button>
+                </form>
+                <div id="curves-result"></div>
+            </div>
 
-    .button-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;  /* Adds space between buttons */
-      justify-content: center;
-      margin: 20px 0;
-    }
+            <div id="comparison" class="tab-content">
+                <h1>image comparison tool</h1>
+                <form id="image-form">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-files"
+                            accept="image/*"
+                            multiple
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose images
+                        </button>
+                        <span class="file-input-label">no files chosen</span>
+                    </div>
+                    <div class="button-container">
+                        <button type="button" id="compare" class="button">
+                            compare
+                        </button>
+                    </div>
+                </form>
+                <div class="image-container" id="image-container"></div>
+                <div class="center">
+                    <button id="download" class="button" style="display: none">
+                        download combined image
+                    </button>
+                </div>
+            </div>
 
-    /* Consistent styling for all download buttons */
-    .button {
-      display: inline-block;
-      padding: 10px 20px;
-      margin: 10px 5px;  /* Add margin around all buttons */
-      background-color: #4CAF50;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      cursor: pointer;
-      border: none;
-      transition: background-color 0.3s;
-    }
-    .button:hover {
-      background-color: #45a049;
-    }
-    .button-margin {
-      margin-bottom: 20px;
-    }
-    .center {
-      display: flex;
-      justify-content: center;
-    }
-    .image-preview {
-      max-width: 100%;
-      height: auto;
-    }
-    #resize-form div {
-      margin: 10px 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    #resize-form label {
-      margin-right: 10px;
-    }
-    .center {
-      display: flex;
-      justify-content: center;
-    }
-    .image-preview {
-      max-width: 100%;
-      height: auto;
-    }
-    #resize {
-      text-align: center;
-    }
-    #resize-form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    #resize-form label,
-    #resize-form input {
-      margin: 5px;
-    }
-    .crop-container {
-      width: 50%;
-      height: 50vh;
-      margin: 20px auto;
-      border: 1px solid #ddd;
-      overflow: hidden;
-    }
-    #crop-image {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+            <div id="colouradjust" class="tab-content">
+                <h1>image colour adjustment tool (wip)</h1>
+                <form id="color-adjustment-form">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-to-adjust"
+                            accept="image/*"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose image
+                        </button>
+                        <span class="file-input-label">no file chosen</span>
+                    </div>
+                    <div>
+                        <label>brightness:</label>
+                        <input
+                            type="range"
+                            id="brightness-slider"
+                            min="-100"
+                            max="100"
+                            value="0"
+                        />
+                        <span id="brightness-value">0</span>
+                    </div>
+                    <div>
+                        <label>contrast:</label>
+                        <input
+                            type="range"
+                            id="contrast-slider"
+                            min="-100"
+                            max="100"
+                            value="0"
+                        />
+                        <span id="contrast-value">0</span>
+                    </div>
+                    <div>
+                        <label>creepify:</label>
+                        <input
+                            type="range"
+                            id="saturation-slider"
+                            min="-100"
+                            max="100"
+                            value="0"
+                        />
+                        <span id="saturation-value">0</span>
+                    </div>
+                    <div>
+                        <label>hue:</label>
+                        <input
+                            type="range"
+                            id="hue-slider"
+                            min="0"
+                            max="360"
+                            value="0"
+                        />
+                        <span id="hue-value">0</span>
+                    </div>
+                    <div class="button-container">
+                        <button id="adjust-colors-btn" class="button">
+                            Apply
+                        </button>
+                    </div>
+                    <div id="color-adjustment-result"></div>
+                </form>
+            </div>
 
-    .color-quality-container {
-      margin-bottom: 10px;
-    }
+            <div id="rotate" class="tab-content">
+                <h1>image rotation tool</h1>
+                <form id="rotate-form">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-to-rotate"
+                            accept="image/*"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            Choose Image
+                        </button>
+                        <span class="file-input-label">No file chosen</span>
+                    </div>
+                    <div>
+                        <label for="rotate-angle">angle (in degrees):</label>
+                        <input
+                            type="number"
+                            id="rotate-angle"
+                            min="0"
+                            max="360"
+                            value="0"
+                        />
+                    </div>
+                    <div>
+                        <button type="button" data-rotate="90" class="button">
+                            90°
+                        </button>
+                        <button type="button" data-rotate="180" class="button">
+                            180°
+                        </button>
+                        <button type="button" data-rotate="270" class="button">
+                            270°
+                        </button>
+                    </div>
+                    <div class="button-container">
+                        <button id="rotate-btn" class="button">
+                            rotate image
+                        </button>
+                    </div>
+                    <div id="rotate-result"></div>
+                </form>
+            </div>
 
-    #curves-canvas {
-      border: 1px solid #ccc;
-      margin: 10px 0;
-    }
+            <div id="flip" class="tab-content">
+                <h1>image flip tool</h1>
+                <form id="flip-form">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-to-flip"
+                            accept="image/*"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose image
+                        </button>
+                        <span class="file-input-label">no file chosen</span>
+                    </div>
+                    <div>
+                        <label for="flip-direction">flip direction:</label>
+                        <select id="flip-direction">
+                            <option value="horizontal">horizontal</option>
+                            <option value="vertical">vertical</option>
+                        </select>
+                    </div>
+                </form>
+                <div id="flip-result" class="center"></div>
+            </div>
 
-    #metadata-display, #metadata-edit {
-      margin-top: 20px;
-    }
+            <div id="compression-jpg" class="tab-content">
+                <h1>image compression tool (jpg)</h1>
+                <form id="compression-form-jpg">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-to-compress-jpg"
+                            accept="image/*"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose image
+                        </button>
+                        <span class="file-input-label">no file chosen</span>
+                    </div>
+                    <div>
+                        <label for="jpg-quality"
+                            >compression quality (%):</label
+                        >
+                        <input
+                            type="range"
+                            id="jpg-quality-slider"
+                            min="1"
+                            max="100"
+                            value="70"
+                        />
+                        <input
+                            type="number"
+                            id="jpg-quality-input"
+                            min="1"
+                            max="100"
+                            value="70"
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        id="compress-jpg"
+                        class="button button-margin"
+                    >
+                        compress
+                    </button>
+                </form>
+                <div id="compression-result-jpg"></div>
+            </div>
 
-    #metadata-edit-form label {
-      display: inline-block;
-      width: 150px;
-      margin-right: 10px;
-    }
+            <div id="compression-png" class="tab-content">
+                <h1>image compression tool (png)</h1>
+                <form id="compression-form-png">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-to-compress-png"
+                            accept="image/*"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose image
+                        </button>
+                        <span class="file-input-label">no file chosen</span>
+                    </div>
+                    <div>
+                        <label for="png-resize-factor"
+                            >resize factor (%):</label
+                        >
+                        <input
+                            type="range"
+                            id="png-resize-factor"
+                            min="10"
+                            max="100"
+                            value="70"
+                        />
+                        <span id="png-resize-value">70%</span>
+                    </div>
+                    <div class="color-quality-container">
+                        <label for="png-color-quality">color quality:</label>
+                        <select id="png-color-quality">
+                            <option value="high">high (24-bit)</option>
+                            <option value="medium">medium (16-bit)</option>
+                            <option value="low">low (8-bit)</option>
+                        </select>
+                    </div>
+                    <button
+                        type="button"
+                        id="compress-png"
+                        class="button button-margin"
+                    >
+                        compress
+                    </button>
+                </form>
+                <div id="compression-result-png"></div>
+            </div>
 
-    #metadata-edit-form input {
-      margin-bottom: 10px;
-    }
+            <div id="resize" class="tab-content">
+                <h1>image resize tool</h1>
+                <form id="resize-form">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-to-resize"
+                            accept="image/*"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose image
+                        </button>
+                        <span class="file-input-label">no file chosen</span>
+                    </div>
+                    <div>
+                        <label for="resize-width">width (px):</label>
+                        <input type="number" id="resize-width" />
+                    </div>
+                    <div>
+                        <label for="resize-height">height (px):</label>
+                        <input type="number" id="resize-height" />
+                    </div>
+                    <div>
+                        <label for="resize-percentage">scale (%):</label>
+                        <input
+                            type="number"
+                            id="resize-percentage"
+                            min="0"
+                            max="400"
+                            step="1"
+                            value="100"
+                        />
+                    </div>
+                    <div class="center">
+                        <button
+                            type="button"
+                            id="resize-image"
+                            class="button button-margin"
+                        >
+                            resize
+                        </button>
+                    </div>
+                </form>
+                <div id="resize-preview" class="image-container"></div>
+                <div id="resize-result" class="result-container"></div>
+            </div>
 
-    @media (max-width: 768px) {
-      .tabs {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .tabs button {
-        margin-bottom: 5px;  /* Space between buttons when they're stacked */
-      }
-    }
-  </style>
-
-</head>
-<body>
-  <div class="container">
-    <div class="tabs">
-      <!--
-<button class="tab-link" data-tab="compression-video">video compression (do not click, does not work)</button> -->
-      <button class="tab-link" data-tab="comparison">image comparison</button>
-      <button class="tab-link" data-tab="compression-jpg">image compression (jpg)</button>
-      <button class="tab-link" data-tab="compression-png">image compression (png)</button>
-      <button class="tab-link" data-tab="resize">image resize</button>
-      <button class="tab-link" data-tab="crop">image crop</button>
-      <button class="tab-link" data-tab="flip">image flip</button>
-      <button class="tab-link" data-tab="rotate">image rotate</button>
-      <button class="tab-link" data-tab="colouradjust">image colour adjustment (wip)</button>
-      <button class="tab-link" data-tab="colorcurves">color curves</button>
-      <button class="tab-link" data-tab="metadata">image metadata</button>
-      <button class="tab-link" data-tab="merge-pdf">merge PDF</button>
-      <button class="tab-link" data-tab="split-pdf">split PDF</button>
-
-    </div>
-
-    <div id="merge-pdf" class="tab-content">
-      <h1>merge PDF tool</h1>
-      <form id="merge-pdf-form">
-        <input type="file" id="pdf-files" accept=".pdf" multiple>
-        <button type="button" id="merge-pdf-btn" class="button">merge PDFs</button>
-      </form>
-      <div id="merge-pdf-result"></div>
-    </div>
-
-    <div id="split-pdf" class="tab-content">
-      <h1>split PDF tool</h1>
-      <form id="split-pdf-form">
-        <input type="file" id="pdf-to-split" accept=".pdf">
-        <div>
-          <label for="split-method">split method:</label>
-          <select id="split-method">
-            <option value="all">split all pages</option>
-            <option value="range">split by page range</option>
-          </select>
+            <div id="crop" class="tab-content">
+                <h1>image crop tool</h1>
+                <form id="crop-form">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-to-crop"
+                            accept="image/*"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose image
+                        </button>
+                        <span class="file-input-label">no file chosen</span>
+                    </div>
+                    <div>
+                        <label for="aspect-ratio">aspect ratio:</label>
+                        <select id="aspect-ratio">
+                            <option value="free">free</option>
+                            <option value="1">1:1 (square)</option>
+                            <option value="2/3">2:3</option>
+                            <option value="3/2">3:2</option>
+                            <option value="3/4">3:4</option>
+                            <option value="4/3">4:3</option>
+                            <option value="4/5">4:5</option>
+                            <option value="5/4">5:4</option>
+                            <option value="9/16">9:16</option>
+                            <option value="16/9">16:9</option>
+                        </select>
+                    </div>
+                    <div class="crop-container">
+                        <img
+                            id="crop-image"
+                            src=""
+                            alt="upload a file to preview"
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        id="crop-btn"
+                        class="button button-margin"
+                    >
+                        crop
+                    </button>
+                </form>
+                <div id="crop-result" class="center"></div>
+            </div>
         </div>
-        <div id="page-range-input" style="display: none;">
-          <label for="page-range">page range (e.g., 1-3,5,7-9):</label>
-          <input type="text" id="page-range">
-        </div>
-        <button type="button" id="split-pdf-btn" class="button">split PDF</button>
-      </form>
-      <div id="split-pdf-result"></div>
-      <div id="merge-split-pdfs" style="display: none;">
-        <button id="merge-split-pdfs-btn" class="button">merge split PDFs</button>
-      </div>
-    </div>
 
-    <div id="metadata" class="tab-content">
-      <h1>image metadata viewer/editor</h1>
-      <form id="metadata-form">
-        <input type="file" id="image-for-metadata" accept="image/*">
-      </form>
-      <div id="metadata-display"></div>
-      <div id="metadata-edit" style="display: none;">
-        <h2>edit metadata</h2>
-        <form id="metadata-edit-form">
-          <!-- Editable fields will be dynamically added here -->
-        </form>
-        <button id="save-metadata" class="button">save metadata</button>
-      </div>
-    </div>
-
-    <div id="colorcurves" class="tab-content">
-      <h1>color curves adjustment</h1>
-      <form id="color-curves-form">
-        <input type="file" id="image-for-curves" accept="image/*">
-        <div>
-          <canvas id="curves-canvas" width="256" height="256"></canvas>
-        </div>
-        <div>
-          <label for="curve-type">curve type:</label>
-          <select id="curve-type">
-            <option value="rgb">rgb</option>
-            <option value="r">red</option>
-            <option value="g">green</option>
-            <option value="b">blue</option>
-          </select>
-        </div>
-        <button type="button" id="apply-curves" class="button">apply curve</button>
-        <button type="button" id="reset-curves" class="button">reset curve</button>
-      </form>
-      <div id="curves-result"></div>
-    </div>
-
-    <div id="comparison" class="tab-content">
-      <h1>image comparison tool</h1>
-      <form id="image-form">
-        <input type="file" id="image-files" accept="image/*" multiple>
-        <button type="button" id="compare" class="button">compare</button>
-      </form>
-      <div class="image-container" id="image-container"></div>
-      <div class="center">
-        <button id="download" class="button" style="display: none;">download combined image</button>
-      </div>
-    </div>
-
-    <div id="colouradjust" class="tab-content">
-      <h1>image colour adjustment tool (wip)</h1>
-      <form id="color-adjustment-form">
-        <input type="file" id="image-to-adjust" accept="image/*">
-        <div>
-          <label>brightness:</label>
-          <input type="range" id="brightness-slider" min="-100" max="100" value="0">
-          <span id="brightness-value">0</span>
-        </div>
-        <div>
-          <label>contrast:</label>
-          <input type="range" id="contrast-slider" min="-100" max="100" value="0">
-          <span id="contrast-value">0</span>
-        </div>
-        <div>
-          <label>creepify:</label>
-          <input type="range" id="saturation-slider" min="-100" max="100" value="0">
-          <span id="saturation-value">0</span>
-        </div>
-        <div>
-          <label>hue:</label>
-          <input type="range" id="hue-slider" min="0" max="360" value="0">
-          <span id="hue-value">0</span>
-        </div>
-        <button id="adjust-colors-btn">apply</button>
-        <div id="color-adjustment-result"></div>
-      </form>
-      </div>
-
-      <div id="rotate" class="tab-content">
-        <h1>image rotation tool</h1>
-        <form id="rotate-form">
-          <input type="file" id="image-to-rotate" accept="image/*">
-          <div>
-            <label for="rotate-angle">angle (in degrees):</label>
-            <input type="number" id="rotate-angle" min="0" max="360" value="0">
-          </div>
-          <div>
-            <button type="button" data-rotate="90">90°</button>
-            <button type="button" data-rotate="180">180°</button>
-            <button type="button" data-rotate="270">270°</button>
-          </div>
-          <button id="rotate-btn">Rotate Image</button>
-          <div id="rotate-result"></div>
-        </form>
-        <div class="image-container" id="image-container"></div>
-        <div class="center">
-          <button id="download" class="button" style="display: none;">download rotated image</button>
-        </div>
-      </div>
-
-    <div id="compression-video" class="tab-content">
-      <h1>video compression tool (out of order)</h1>
-      <form id="compression-form-video">
-        <input type="file" id="video-to-compress" accept="video/*">
-        <label for="video-quality">quality (1-31, lower is better):</label>
-        <input type="number" id="video-quality" min="1" max="31" value="23">
-        <button type="button" id="compress-video" class="button button-margin">compress</button>
-      </form>
-      <div id="compression-result-video"></div>
-    </div>
-
-    <div id="flip" class="tab-content">
-      <h1>image flip tool</h1>
-      <form id="flip-form">
-        <input type="file" id="image-to-flip" accept="image/*">
-        <label for="flip-direction">flip direction:</label>
-        <select id="flip-direction">
-          <option value="horizontal">horizontal</option>
-          <option value="vertical">vertical</option>
-        </select>
-      </form>
-      <div id="flip-result" class="center"></div>
-    </div>
-
-    <div id="compression-jpg" class="tab-content">
-      <h1>image compression tool (jpg)</h1>
-      <form id="compression-form-jpg">
-        <input type="file" id="image-to-compress-jpg" accept="image/*">
-        <div>
-          <label for="jpg-quality">compression quality (%):</label>
-          <input type="range" id="jpg-quality-slider" min="1" max="100" value="70">
-          <input type="number" id="jpg-quality-input" min="1" max="100" value="70">
-        </div>
-        <button type="button" id="compress-jpg" class="button button-margin">compress</button>
-      </form>
-      <div id="compression-result-jpg"></div>
-    </div>
-
-    <div id="compression-png" class="tab-content">
-      <h1>image compression tool (png)</h1>
-      <form id="compression-form-png">
-        <input type="file" id="image-to-compress-png" accept="image/*">
-        <div>
-          <label for="png-resize-factor">resize factor (%):</label>
-          <input type="range" id="png-resize-factor" min="10" max="100" value="70">
-          <span id="png-resize-value">70%</span>
-        </div>
-        <div class="color-quality-container">
-          <label for="png-color-quality">color quality:</label>
-          <select id="png-color-quality">
-            <option value="high">high (24-bit)</option>
-            <option value="medium">medium (16-bit)</option>
-            <option value="low">low (8-bit)</option>
-          </select>
-        </div>
-        <button type="button" id="compress-png" class="button button-margin">compress</button>
-      </form>
-      <div id="compression-result-png"></div>
-    </div>
-
-    <div id="resize" class="tab-content">
-      <h1>image resize tool</h1>
-      <form id="resize-form">
-        <input type="file" id="image-to-resize" accept="image/*">
-        <div>
-          <label for="resize-width">width (px):</label>
-          <input type="number" id="resize-width">
-        </div>
-        <div>
-          <label for="resize-height">height (px):</label>
-          <input type="number" id="resize-height">
-        </div>
-        <div>
-          <label for="resize-percentage">scale (%):</label>
-          <input type="number" id="resize-percentage" min="0" max="400" step="1" value="100">
-        </div>
-        <div class="center">
-          <button type="button" id="resize-image" class="button button-margin">resize</button>
-        </div>
-      </form>
-      <div id="resize-preview" class="image-container"></div>
-      <div id="resize-result" class="result-container"></div>
-    </div>
-
-    <div id="crop" class="tab-content">
-      <h1>image crop tool</h1>
-      <form id="crop-form">
-        <input type="file" id="image-to-crop" accept="image/*">
-        <div>
-          <label for="aspect-ratio">aspect ratio:</label>
-          <select id="aspect-ratio">
-            <option value="free">free</option>
-            <option value="1">1:1 (square)</option>
-            <option value="2/3">2:3</option>
-            <option value="3/2">3:2</option>
-            <option value="3/4">3:4</option>
-            <option value="4/3">4:3</option>
-            <option value="4/5">4:5</option>
-            <option value="5/4">5:4</option>
-            <option value="9/16">9:16</option>
-            <option value="16/9">16:9</option>
-          </select>
-        </div>
-        <div class="crop-container">
-          <img id="crop-image" src="" alt="upload a file to preview">
-        </div>
-        <button type="button" id="crop-btn" class="button button-margin">crop</button>
-      </form>
-      <div id="crop-result" class="center"></div>
-    </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-  <script src="script.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-</body>
+        <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.2"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+        <script src="script.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    </body>
 </html>
