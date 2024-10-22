@@ -215,6 +215,12 @@
                     margin-bottom: 5px;
                 }
             }
+
+            #resize .file-input-wrapper {
+                width: 80%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
         </style>
     </head>
     <body>
@@ -262,9 +268,11 @@
                         </button>
                         <span class="file-input-label">no files chosen</span>
                     </div>
-                    <button type="button" id="merge-pdf-btn" class="button">
-                        merge PDFs
-                    </button>
+                    <div class="button-container">
+                        <button type="button" id="merge-pdf-btn" class="button">
+                            merge PDFs
+                        </button>
+                    </div>
                 </form>
                 <div id="merge-pdf-result"></div>
             </div>
