@@ -702,53 +702,35 @@
             </div>
 
             <div id="crop" class="tab-content">
-                <h1>image crop tool</h1>
-                <form id="crop-form">
-                    <div class="file-input-wrapper">
-                        <input
-                            type="file"
-                            id="image-to-crop"
-                            accept="image/*"
-                            class="file-input"
-                        />
-                        <button type="button" class="file-input-button">
-                            choose image
-                        </button>
-                        <span class="file-input-label">no file chosen</span>
-                    </div>
-                    <div>
-                        <label for="aspect-ratio">aspect ratio:</label>
-                        <select id="aspect-ratio">
-                            <option value="free">free</option>
-                            <option value="1">1:1 (square)</option>
-                            <option value="2/3">2:3</option>
-                            <option value="3/2">3:2</option>
-                            <option value="3/4">3:4</option>
-                            <option value="4/3">4:3</option>
-                            <option value="4/5">4:5</option>
-                            <option value="5/4">5:4</option>
-                            <option value="9/16">9:16</option>
-                            <option value="16/9">16:9</option>
-                        </select>
-                    </div>
-                    <div class="crop-container">
-                        <img
-                            id="crop-image"
-                            src=""
-                            alt="upload a file to preview"
-                        />
-                    </div>
-                    <button
-                        type="button"
-                        id="crop-btn"
-                        class="button button-margin"
-                    >
-                        crop
-                    </button>
-                </form>
-                <div id="crop-result" class="center"></div>
+              <h1>image crop tool</h1>
+              <form id="crop-form">
+                <div class="file-input-wrapper">
+                  <input type="file" id="image-to-crop" accept="image/*" class="file-input" />
+                  <button type="button" class="file-input-button">choose image</button>
+                  <span class="file-input-label">no file chosen</span>
+                </div>
+                <div>
+                  <label for="aspect-ratio">aspect Ratio:</label>
+                  <select id="aspect-ratio">
+                    <option value="free">free</option>
+                    <option value="1">1:1 (square)</option>
+                    <option value="2/3">2:3</option>
+                    <option value="3/2">3:2</option>
+                    <option value="3/4">3:4</option>
+                    <option value="4/3">4:3</option>
+                    <option value="4/5">4:5</option>
+                    <option value="5/4">5:4</option>
+                    <option value="9/16">9:16</option>
+                    <option value="16/9">16:9</option>
+                  </select>
+                </div>
+                <div class="crop-container">
+                  <img id="crop-image" src="" alt="upload an image to crop" />
+                </div>
+                <button type="button" id="crop-btn" class="button button-margin">crop</button>
+              </form>
+              <div id="crop-result" class="center"></div>
             </div>
-        </div>
 
         <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.2"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>

@@ -355,56 +355,50 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Crop Logic
-  const aspectRatioSelect = document.getElementById("aspect-ratio");
   const cropForm = document.getElementById("crop-form");
   const cropBtn = document.getElementById("crop-btn");
   const cropResult = document.getElementById("crop-result");
   const cropImage = document.getElementById("crop-image");
+  const aspectRatioSelect = document.getElementById("aspect-ratio");
   let cropper;
 
-  aspectRatioSelect.addEventListener("change", () => {
-    if (cropper) {
-      const selectedAspectRatio = aspectRatioSelect.value;
-      if (selectedAspectRatio === "free") {
-        cropper.setAspectRatio(NaN);
-      } else if (selectedAspectRatio === "1") {
-        cropper.setAspectRatio(1);
-      } else {
-        const [width, height] = selectedAspectRatio.split("/").map(Number);
-        cropper.setAspectRatio(width / height);
-      }
-    }
-  });
-
-  cropForm.addEventListener("change", (e) => {
-    const input = e.target;
-    if (input.id === "image-to-crop" && input.files.length > 0) {
+  document.getElementById("image-to-crop").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (file) {
       const reader = new FileReader();
-      reader.onload = () => {
-        cropImage.src = reader.result;
+      reader.onload = function(event) {
+        cropImage.src = event.target.result;
         if (cropper) {
           cropper.destroy();
         }
-        const selectedAspectRatio = aspectRatioSelect.value;
-        let aspectRatio;
-        if (selectedAspectRatio === "free") {
-          aspectRatio = NaN;
-        } else if (selectedAspectRatio === "1") {
-          aspectRatio = 1;
-        } else {
-          const [width, height] = selectedAspectRatio.split("/").map(Number);
-          aspectRatio = width / height;
-        }
         cropper = new Cropper(cropImage, {
-          aspectRatio: aspectRatio,
+          aspectRatio: getAspectRatio(),
           viewMode: 1,
           minCropBoxWidth: 100,
           minCropBoxHeight: 100,
         });
       };
-      reader.readAsDataURL(input.files[0]);
+      reader.readAsDataURL(file);
     }
   });
+
+  aspectRatioSelect.addEventListener("change", () => {
+    if (cropper) {
+      cropper.setAspectRatio(getAspectRatio());
+    }
+  });
+
+  function getAspectRatio() {
+    const selectedAspectRatio = aspectRatioSelect.value;
+    if (selectedAspectRatio === "free") {
+      return NaN;
+    } else if (selectedAspectRatio === "1") {
+      return 1;
+    } else {
+      const [width, height] = selectedAspectRatio.split("/").map(Number);
+      return width / height;
+    }
+  }
 
   cropBtn.addEventListener("click", (e) => {
     e.preventDefault();
@@ -412,7 +406,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const canvas = cropper.getCroppedCanvas();
       const dataURL = canvas.toDataURL("image/png");
 
-      const cropResult = document.getElementById("crop-result");
       cropResult.innerHTML = "";
 
       const resultContainer = document.createElement("div");
