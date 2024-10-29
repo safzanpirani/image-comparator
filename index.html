@@ -182,6 +182,18 @@
                 transition: all 0.3s ease;
             }
 
+            #pdf-to-word {
+                text-align: center;
+            }
+
+            #pdf-to-word-result {
+                margin-top: 20px;
+            }
+
+            #pdf-to-word-result p {
+                margin: 10px 0;
+            }
+
             .file-input-wrapper.dragover {
                 background-color: #f0f0f0;
                 border-color: #999;
@@ -256,7 +268,23 @@
                 </button>
                 <button class="tab-link" data-tab="merge-pdf">merge PDF</button>
                 <button class="tab-link" data-tab="split-pdf">split PDF</button>
-            </div>
+                <button class="tab-link" data-tab="pdf-to-word">pdf to word</button>
+                </div>
+
+                <div id="pdf-to-word" class="tab-content">
+                    <h1>PDF to word converter</h1>
+                    <form id="pdf-to-word-form">
+                        <div class="file-input-wrapper">
+                            <input type="file" id="pdf-file-to-word" accept=".pdf" class="file-input" />
+                            <button type="button" class="file-input-button">choose PDF</button>
+                            <span class="file-input-label">no file chosen</span>
+                        </div>
+                        <div class="button-container">
+                            <button type="button" id="convert-pdf-to-word-btn" class="button">convert to word</button>
+                        </div>
+                    </form>
+                    <div id="pdf-to-word-result"></div>
+                </div>
 
             <div id="merge-pdf" class="tab-content">
                 <h1>merge PDF tool</h1>

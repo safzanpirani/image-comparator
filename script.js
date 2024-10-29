@@ -362,25 +362,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const aspectRatioSelect = document.getElementById("aspect-ratio");
   let cropper;
 
-  document.getElementById("image-to-crop").addEventListener("change", function(e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        cropImage.src = event.target.result;
-        if (cropper) {
-          cropper.destroy();
-        }
-        cropper = new Cropper(cropImage, {
-          aspectRatio: getAspectRatio(),
-          viewMode: 1,
-          minCropBoxWidth: 100,
-          minCropBoxHeight: 100,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  });
+  document
+    .getElementById("image-to-crop")
+    .addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          cropImage.src = event.target.result;
+          if (cropper) {
+            cropper.destroy();
+          }
+          cropper = new Cropper(cropImage, {
+            aspectRatio: getAspectRatio(),
+            viewMode: 1,
+            minCropBoxWidth: 100,
+            minCropBoxHeight: 100,
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
   aspectRatioSelect.addEventListener("change", () => {
     if (cropper) {
@@ -823,6 +825,116 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("image-to-rotate")
     .addEventListener("change", updateRotatedImage);
+
+  // PDF to Word conversion logic
+  const pdfToWordForm = document.getElementById("pdf-to-word-form");
+  const convertPdfToWordBtn = document.getElementById(
+    "convert-pdf-to-word-btn",
+  );
+  const pdfToWordResult = document.getElementById("pdf-to-word-result");
+  const pdfFileInput = document.getElementById("pdf-file-to-word");
+
+  // Update file input label when file is selected
+  pdfFileInput.addEventListener("change", function () {
+    const label = this.closest(".file-input-wrapper").querySelector(
+      ".file-input-label",
+    );
+    if (this.files.length > 0) {
+      label.textContent = this.files[0].name;
+    } else {
+      label.textContent = "no file chosen";
+    }
+  });
+
+  // Handle conversion button click
+  convertPdfToWordBtn.addEventListener("click", async () => {
+    if (!pdfFileInput.files.length) {
+      alert("please select a PDF file");
+      return;
+    }
+
+    const file = pdfFileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // Show loading message
+    pdfToWordResult.innerHTML = `
+          <p>converting your PDF to word...</p>
+          <p>this may take a few moments depending on the file size.</p>
+      `;
+
+    try {
+      const response = await fetch("https://api.safzan.tech/convert", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "conversion failed");
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file.name.replace(".pdf", ".docx");
+      a.className = "button";
+      a.textContent = "download word document";
+
+      // Clear previous result and add download button
+      pdfToWordResult.innerHTML = "<p>conversion successful!</p>";
+      pdfToWordResult.appendChild(a);
+
+      // Add event listener to clean up the URL object after download
+      a.addEventListener("click", () => {
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+        }, 100);
+      });
+    } catch (error) {
+      pdfToWordResult.innerHTML = `
+              <p style="color: red;">Error: ${error.message}</p>
+              <p>please try again or contact safzan directly. :'(</p>
+          `;
+    }
+  });
+
+  // Add drag and drop functionality for PDF files
+  const pdfDropZone = pdfFileInput.closest(".file-input-wrapper");
+
+  pdfDropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pdfDropZone.classList.add("dragover");
+  });
+
+  pdfDropZone.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pdfDropZone.classList.remove("dragover");
+  });
+
+  pdfDropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pdfDropZone.classList.remove("dragover");
+
+    const files = e.dataTransfer.files;
+    if (files.length) {
+      if (files[0].type === "application/pdf") {
+        pdfFileInput.files = files;
+        const label = pdfDropZone.querySelector(".file-input-label");
+        label.textContent = files[0].name;
+      } else {
+        alert("please drop a PDF file");
+      }
+    }
+  });
+
   // Color Adjustment Logic
   const colorAdjustmentForm = document.getElementById("color-adjustment-form");
   const adjustColorsBtn = document.getElementById("adjust-colors-btn");
