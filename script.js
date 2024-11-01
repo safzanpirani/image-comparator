@@ -1260,6 +1260,26 @@ document.addEventListener("DOMContentLoaded", () => {
     drawCurve();
   });
 
+  const checkbox = document.getElementById("checkbox");
+  const body = document.body;
+
+  // Check for saved theme preference
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme) {
+    body.classList.toggle("light-theme", savedTheme === "light");
+    checkbox.checked = savedTheme === "light";
+  }
+
+  // Handle theme toggle
+  checkbox.addEventListener("change", function () {
+    body.classList.toggle("light-theme");
+    // Save theme preference
+    localStorage.setItem(
+      "theme",
+      body.classList.contains("light-theme") ? "light" : "dark",
+    );
+  });
+
   // Metadata Logic
   const metadataForm = document.getElementById("metadata-form");
   const metadataDisplay = document.getElementById("metadata-display");

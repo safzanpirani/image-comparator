@@ -3,245 +3,469 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#1a1a1a">
         <title>image tool</title>
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"
         />
         <style>
+            :root {
+              /* Light theme */
+              --primary-color-light: #4caf50;
+              --background-light: #ffffff;
+              --text-dark: #333333;
+              --card-background-light: #f5f5f5;
+              --hover-color-light: #45a049;
+              --tab-background-light: #ddd;
+              --tab-hover-light: #ccc;
+              --tab-active-light: #bbb;
+              --border-color-light: #ccc;
+              --slider-track-light: #ddd;
+              --slider-thumb-light: var(--primary-color-light);
+
+              /* Dark theme */
+              --primary-color-dark: #9370DB;
+              --background-dark: #121212;
+              --text-light: #e0e0e0;
+              --card-background-dark: #2d2d2d;
+              --hover-color-dark: #7B68EE;
+              --tab-background-dark: #333;
+              --tab-hover-dark: #444;
+              --tab-active-dark: #555;
+              --border-color-dark: #444;
+              --slider-track-dark: #444;
+              --slider-thumb-dark: var(--primary-color-dark);
+
+              /* Default to dark theme */
+              --primary-color: var(--primary-color-dark);
+              --background: var(--background-dark);
+              --text-color: var(--text-light);
+              --card-background: var(--card-background-dark);
+              --hover-color: var(--hover-color-dark);
+              --tab-background: var(--tab-background-dark);
+              --tab-hover: var(--tab-hover-dark);
+              --tab-active: var(--tab-active-dark);
+              --border-color: var(--border-color-dark);
+              --slider-track: var(--slider-track-dark);
+              --slider-thumb: var(--slider-thumb-dark);
+            }
+
             body {
-                font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 0;
+              font-family: Arial, sans-serif;
+              background-color: var(--background);
+              color: var(--text-color);
+              transition: all 0.3s ease;
             }
+
+            body.light-theme {
+              --primary-color: var(--primary-color-light);
+              --background: var(--background-light);
+              --text-color: var(--text-dark);
+              --card-background: var(--card-background-light);
+              --hover-color: var(--hover-color-light);
+              --tab-background: var(--tab-background-light);
+              --tab-hover: var(--tab-hover-light);
+              --tab-active: var(--tab-active-light);
+              --border-color: var(--border-color-light);
+              --slider-track: var(--slider-track-light);
+              --slider-thumb: var(--slider-thumb-light);
+            }
+
+            .theme-switch-wrapper {
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              display: flex;
+              align-items: center;
+              z-index: 1000;
+            }
+
+            .theme-switch {
+              display: inline-block;
+              height: 34px;
+              position: relative;
+              width: 60px;
+            }
+
+            .theme-switch input {
+              display: none;
+            }
+
+            .slider {
+              background-color: var(--card-background);
+              bottom: 0;
+              cursor: pointer;
+              left: 0;
+              position: absolute;
+              right: 0;
+              top: 0;
+              transition: .4s;
+              border-radius: 34px;
+            }
+
+            .slider:before {
+              background-color: var(--primary-color);
+              bottom: 4px;
+              content: "";
+              height: 26px;
+              left: 4px;
+              position: absolute;
+              transition: .4s;
+              width: 26px;
+              border-radius: 50%;
+            }
+
+            input:checked + .slider:before {
+              transform: translateX(26px);
+            }
+
             .container {
-                max-width: 800px;
-                margin: 40px auto;
-                text-align: center;
+              max-width: 800px;
+              margin: 40px auto;
+              text-align: center;
             }
+
             .tabs {
-                display: flex;
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 10px;
-                margin-bottom: 20px;
+              display: flex;
+              justify-content: center;
+              flex-wrap: wrap;
+              gap: 10px;
+              margin-bottom: 20px;
             }
 
             .tabs button {
-                padding: 10px 20px;
-                cursor: pointer;
-                border: none;
-                background-color: #ddd;
-                border-radius: 5px;
-                transition: background-color 0.3s;
+              padding: 10px 20px;
+              cursor: pointer;
+              border: none;
+              background-color: var(--tab-background);
+              color: var(--text-color);
+              border-radius: 5px;
+              transition: background-color 0.3s;
             }
 
             .tabs button:hover {
-                background-color: #ccc;
+              background-color: var(--hover-color);
             }
 
             .tabs button.active {
-                background-color: #bbb;
-                font-weight: bold;
+              background-color: var(--primary-color);
+              color: var(--background);
+              font-weight: bold;
             }
+
             .tab-content {
-                display: none;
+              display: none;
             }
+
             .tab-content.active {
-                display: block;
+              display: block;
             }
+
             .image-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-wrap: nowrap;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              flex-wrap: nowrap;
             }
+
             .image-container img {
-                width: 50%;
-                height: auto;
-                display: inline-block;
-                margin: 0;
-                padding: 0;
-                border: 0;
+              width: 50%;
+              height: auto;
+              display: inline-block;
+              margin: 0;
+              padding: 0;
+              border: 0;
             }
+
             form {
-                margin-bottom: 20px;
+              margin-bottom: 20px;
             }
+
             form input,
             form select,
             form button {
-                margin: 10px 0;
+              margin: 10px 0;
+              background-color: var(--card-background);
+              color: var(--text-color);
+              border: 1px solid var(--primary-color);
+              border-radius: 5px;
+              padding: 5px 10px;
             }
+
             input[type="file"] {
-                margin: 20px 0;
+              margin: 20px 0;
             }
+
             #compression-result img {
-                max-width: 100%;
-                height: auto;
+              max-width: 100%;
+              height: auto;
             }
+
             .result-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
             }
+
             .result-container img {
-                max-width: 100%;
-                height: auto;
-                margin-bottom: 20px;
+              max-width: 100%;
+              height: auto;
+              margin-bottom: 20px;
             }
+
             .button-container {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 15px;
-                justify-content: center;
-                margin: 20px 0;
+              display: flex;
+              flex-wrap: wrap;
+              gap: 15px;
+              justify-content: center;
+              margin: 20px 0;
             }
+
             .button {
-                display: inline-block;
-                padding: 10px 20px;
-                margin: 10px 5px;
-                background-color: #4caf50;
-                color: white;
-                text-decoration: none;
-                border-radius: 5px;
-                cursor: pointer;
-                border: none;
-                transition: background-color 0.3s;
+              display: inline-block;
+              padding: 10px 20px;
+              margin: 10px 5px;
+              background-color: var(--primary-color);
+              color: var(--background);
+              text-decoration: none;
+              border-radius: 5px;
+              cursor: pointer;
+              border: none;
+              transition: background-color 0.3s;
             }
+
             .button:hover {
-                background-color: #45a049;
+              background-color: var(--hover-color);
             }
+
             .button-margin {
-                margin-bottom: 20px;
+              margin-bottom: 20px;
             }
+
             .center {
-                display: flex;
-                justify-content: center;
+              display: flex;
+              justify-content: center;
             }
+
             .image-preview {
-                max-width: 100%;
-                height: auto;
+              max-width: 100%;
+              height: auto;
             }
+
             #resize-form div {
-                margin: 10px 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+              margin: 10px 0;
+              display: flex;
+              justify-content: center;
+              align-items: center;
             }
+
             #resize-form label {
-                margin-right: 10px;
+              margin-right: 10px;
             }
+
             #resize {
-                text-align: center;
+              text-align: center;
             }
+
             #resize-form {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
             }
+
             #resize-form label,
             #resize-form input {
-                margin: 5px;
+              margin: 5px;
             }
+
             .crop-container {
-                width: 50%;
-                height: 50vh;
-                margin: 20px auto;
-                border: 1px solid #ddd;
-                overflow: hidden;
+              width: 50%;
+              height: 50vh;
+              margin: 20px auto;
+              border: 1px solid var(--primary-color);
+              overflow: hidden;
             }
+
             #crop-image {
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
+              width: 100%;
+              height: 100%;
+              object-fit: contain;
             }
+
             .color-quality-container {
-                margin-bottom: 10px;
+              margin-bottom: 10px;
             }
+
             #curves-canvas {
-                border: 1px solid #ccc;
-                margin: 10px 0;
+              border: 1px solid var(--primary-color);
+              margin: 10px 0;
+              background-color: var(--card-background);
             }
+
             #metadata-display,
             #metadata-edit {
-                margin-top: 20px;
+              margin-top: 20px;
             }
+
             #metadata-edit-form label {
-                display: inline-block;
-                width: 150px;
-                margin-right: 10px;
+              display: inline-block;
+              width: 150px;
+              margin-right: 10px;
             }
+
             #metadata-edit-form input {
-                margin-bottom: 10px;
+              margin-bottom: 10px;
             }
+
             .file-input-wrapper {
-                position: relative;
-                display: inline-block;
-                margin-bottom: 10px;
-                padding: 20px;
-                border: 2px dashed #ccc;
-                border-radius: 5px;
-                transition: all 0.3s ease;
+              position: relative;
+              display: inline-block;
+              margin-bottom: 10px;
+              padding: 20px;
+              border: 2px dashed var(--primary-color);
+              border-radius: 5px;
+              transition: all 0.3s ease;
+              background-color: var(--card-background);
             }
 
             #pdf-to-word {
-                text-align: center;
+              text-align: center;
             }
 
             #pdf-to-word-result {
-                margin-top: 20px;
+              margin-top: 20px;
             }
 
             #pdf-to-word-result p {
-                margin: 10px 0;
+              margin: 10px 0;
+              color: var(--text-color);
             }
 
             .file-input-wrapper.dragover {
-                background-color: #f0f0f0;
-                border-color: #999;
+              background-color: var(--hover-color);
+              border-color: var(--primary-color);
             }
 
             .file-input-wrapper::after {
-                content: "drag and drop files here";
-                display: block;
-                margin-top: 10px;
-                font-size: 14px;
-                color: #999;
+              content: "drag and drop files here";
+              display: block;
+              margin-top: 10px;
+              font-size: 14px;
+              color: var(--text-color);
             }
-            .file-input {
-                position: absolute;
-                left: -9999px;
-            }
-            .file-input-button {
-                display: inline-block;
-                padding: 6px 12px;
-                cursor: pointer;
-                background-color: #f0f0f0;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-            }
-            .file-input-label {
-                margin-left: 10px;
-            }
-            @media (max-width: 768px) {
-                .tabs {
-                    display: grid;
-                    grid-template-columns: repeat(2, 1fr);
-                    gap: 10px;
-                }
 
-                .tabs button {
-                    width: 100%;
-                    margin-bottom: 0;
-                }
+            .file-input {
+              position: absolute;
+              left: -9999px;
+            }
+
+            .file-input-button {
+              display: inline-block;
+              padding: 6px 12px;
+              cursor: pointer;
+              background-color: var(--card-background);
+              color: var(--text-color);
+              border: 1px solid var(--primary-color);
+              border-radius: 4px;
+            }
+
+            .file-input-label {
+              margin-left: 10px;
+              color: var(--text-color);
+            }
+
+            @media (max-width: 768px) {
+              .tabs {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+              }
+
+              .tabs button {
+                width: 100%;
+                margin-bottom: 0;
+              }
             }
 
             #resize .file-input-wrapper {
-                width: 80%;
-                max-width: 300px;
-                margin: 0 auto;
+              width: 80%;
+              max-width: 300px;
+              margin: 0 auto;
             }
-        </style>
+
+            h1, h2 {
+              color: var(--primary-color);
+            }
+
+            select {
+              background-color: var(--card-background);
+              color: var(--text-color);
+              border: 1px solid var(--primary-color);
+              border-radius: 4px;
+              padding: 5px;
+            }
+
+            input[type="range"] {
+              -webkit-appearance: none;
+              width: 100%;
+              height: 8px;
+              border-radius: 4px;
+              background: var(--slider-track);
+              outline: none;
+              transition: all 0.3s ease;
+            }
+
+            input[type="range"]::-webkit-slider-thumb {
+              -webkit-appearance: none;
+              appearance: none;
+              width: 16px;
+              height: 16px;
+              border-radius: 50%;
+              background: var(--slider-thumb);
+              cursor: pointer;
+              transition: all 0.3s ease;
+            }
+
+            input[type="range"]::-webkit-slider-thumb:hover {
+              background: var(--hover-color);
+            }
+
+            input[type="range"]::-moz-range-thumb {
+              width: 16px;
+              height: 16px;
+              border: none;
+              border-radius: 50%;
+              background: var(--slider-thumb);
+              cursor: pointer;
+              transition: all 0.3s ease;
+            }
+
+            input[type="range"]::-moz-range-thumb:hover {
+              background: var(--hover-color);
+            }
+
+            input[type="range"]::-moz-range-track {
+              width: 100%;
+              height: 8px;
+              border-radius: 4px;
+              background: var(--slider-track);
+              transition: all 0.3s ease;
+            }
+            </style>
+</rewrite_this>
+</rewrite_this>
     </head>
     <body>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider"></div>
+            </label>
+        </div>
+        <div class="container">
         <div class="container">
             <div class="tabs">
                 <button class="tab-link" data-tab="comparison">
