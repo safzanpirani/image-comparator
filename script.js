@@ -506,7 +506,6 @@ document.addEventListener("DOMContentLoaded", () => {
       reader.readAsDataURL(input.files[0]);
     }
   });
-
   // Image Compression Logic (PNG)
   const compressionFormPNG = document.getElementById("compression-form-png");
   const compressBtnPNG = document.getElementById("compress-png");
@@ -514,11 +513,20 @@ document.addEventListener("DOMContentLoaded", () => {
     "compression-result-png",
   );
   const pngResizeFactor = document.getElementById("png-resize-factor");
-  const pngResizeValue = document.getElementById("png-resize-value");
+  const pngResizeInput = document.getElementById("png-resize-input");
   const pngColorQuality = document.getElementById("png-color-quality");
 
+  // Sync slider and input
   pngResizeFactor.addEventListener("input", () => {
-    pngResizeValue.textContent = `${pngResizeFactor.value}%`;
+    pngResizeInput.value = pngResizeFactor.value;
+  });
+
+  pngResizeInput.addEventListener("input", () => {
+    let value = parseInt(pngResizeInput.value);
+    if (value < 10) value = 10;
+    if (value > 100) value = 100;
+    pngResizeInput.value = value;
+    pngResizeFactor.value = value;
   });
 
   compressBtnPNG.addEventListener("click", (e) => {
@@ -532,7 +540,7 @@ document.addEventListener("DOMContentLoaded", () => {
         img.onload = () => {
           const canvas = document.createElement("canvas");
           const ctx = canvas.getContext("2d");
-          const scale = parseInt(pngResizeFactor.value) / 100;
+          const scale = parseInt(pngResizeInput.value) / 100;
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);

@@ -10,77 +10,85 @@
             href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"
         />
         <style>
-            :root {
-              /* Light theme */
-              --primary-color-light: #4caf50;
-              --background-light: #ffffff;
-              --text-dark: #333333;
-              --card-background-light: #f5f5f5;
-              --hover-color-light: #45a049;
-              --tab-background-light: #ddd;
-              --tab-hover-light: #ccc;
-              --tab-active-light: #bbb;
-              --border-color-light: #ccc;
-              --slider-track-light: #ddd;
-              --slider-thumb-light: var(--primary-color-light);
+          :root {
+            /* Light theme */
+            --primary-color-light: #4caf50;
+            --background-light: #ffffff;
+            --text-dark: #333333;
+            --card-background-light: #f5f5f5;
+            --hover-color-light: #45a049;
+            --tab-background-light: #ddd;
+            --tab-hover-light: #ccc;
+            --tab-active-light: #bbb;
+            --border-color-light: #ccc;
 
-              /* Dark theme */
-              --primary-color-dark: #9370DB;
-              --background-dark: #121212;
-              --text-light: #e0e0e0;
-              --card-background-dark: #2d2d2d;
-              --hover-color-dark: #7B68EE;
-              --tab-background-dark: #333;
-              --tab-hover-dark: #444;
-              --tab-active-dark: #555;
-              --border-color-dark: #444;
-              --slider-track-dark: #444;
-              --slider-thumb-dark: var(--primary-color-dark);
+            /* Dark theme */
+            --primary-color-dark: #9370DB;
+            --background-dark: #121212;
+            --text-light: #e0e0e0;
+            --card-background-dark: #2d2d2d;
+            --hover-color-dark: #7B68EE;
+            --tab-background-dark: #333;
+            --tab-hover-dark: #444;
+            --tab-active-dark: #555;
+            --border-color-dark: #444;
 
-              /* Default to dark theme */
-              --primary-color: var(--primary-color-dark);
-              --background: var(--background-dark);
-              --text-color: var(--text-light);
-              --card-background: var(--card-background-dark);
-              --hover-color: var(--hover-color-dark);
-              --tab-background: var(--tab-background-dark);
-              --tab-hover: var(--tab-hover-dark);
-              --tab-active: var(--tab-active-dark);
-              --border-color: var(--border-color-dark);
-              --slider-track: var(--slider-track-dark);
-              --slider-thumb: var(--slider-thumb-dark);
-            }
+            /* Slider colors for dark theme */
+            --slider-track-background-dark: #444;
+            --slider-thumb-background-dark: var(--primary-color-dark);
 
-            body {
-              margin: 0;
-              padding: 0;
-              font-family: Arial, sans-serif;
-              background-color: var(--background);
-              color: var(--text-color);
-              transition: all 0.3s ease;
-            }
+            /* Slider colors for light theme */
+            --slider-track-background-light: #ccc;
+            --slider-thumb-background-light: var(--primary-color-light);
 
-            body.light-theme {
-              --primary-color: var(--primary-color-light);
-              --background: var(--background-light);
-              --text-color: var(--text-dark);
-              --card-background: var(--card-background-light);
-              --hover-color: var(--hover-color-light);
-              --tab-background: var(--tab-background-light);
-              --tab-hover: var(--tab-hover-light);
-              --tab-active: var(--tab-active-light);
-              --border-color: var(--border-color-light);
-              --slider-track: var(--slider-track-light);
-              --slider-thumb: var(--slider-thumb-light);
-            }
+            /* Default to dark theme */
+            --primary-color: var(--primary-color-dark);
+            --background: var(--background-dark);
+            --text-color: var(--text-light);
+            --card-background: var(--card-background-dark);
+            --hover-color: var(--hover-color-dark);
+            --tab-background: var(--tab-background-dark);
+            --tab-hover: var(--tab-hover-dark);
+            --tab-active: var(--tab-active-dark);
+            --border-color: var(--border-color-dark);
+
+            /* Initialize slider variables */
+            --slider-track-background: var(--slider-track-background-dark);
+            --slider-thumb-background: var(--slider-thumb-background-dark);
+          }
+
+          body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+          }
+
+          body.light-theme {
+            --primary-color: var(--primary-color-light);
+            --background: var(--background-light);
+            --text-color: var(--text-dark);
+            --card-background: var(--card-background-light);
+            --hover-color: var(--hover-color-light);
+            --tab-background: var(--tab-background-light);
+            --tab-hover: var(--tab-hover-light);
+            --tab-active: var(--tab-active-light);
+            --border-color: var(--border-color-light);
+
+            /* Override slider variables for light theme */
+            --slider-track-background: var(--slider-track-background-light);
+            --slider-thumb-background: var(--slider-thumb-background-light);
+          }
 
             .theme-switch-wrapper {
-              position: fixed;
-              top: 20px;
-              right: 20px;
-              display: flex;
-              align-items: center;
-              z-index: 1000;
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                display: flex;
+                align-items: center;
+                z-index: 1000;
             }
 
             .theme-switch {
@@ -95,31 +103,31 @@
             }
 
             .slider {
-              background-color: var(--card-background);
-              bottom: 0;
-              cursor: pointer;
-              left: 0;
-              position: absolute;
-              right: 0;
-              top: 0;
-              transition: .4s;
-              border-radius: 34px;
+                background-color: var(--card-background);
+                bottom: 0;
+                cursor: pointer;
+                left: 0;
+                position: absolute;
+                right: 0;
+                top: 0;
+                transition: .4s;
+                border-radius: 34px;
             }
 
             .slider:before {
-              background-color: var(--primary-color);
-              bottom: 4px;
-              content: "";
-              height: 26px;
-              left: 4px;
-              position: absolute;
-              transition: .4s;
-              width: 26px;
-              border-radius: 50%;
+                background-color: var(--primary-color);
+                bottom: 4px;
+                content: "";
+                height: 26px;
+                left: 4px;
+                position: absolute;
+                transition: .4s;
+                width: 26px;
+                border-radius: 50%;
             }
 
             input:checked + .slider:before {
-              transform: translateX(26px);
+                transform: translateX(26px);
             }
 
             .container {
@@ -129,21 +137,21 @@
             }
 
             .tabs {
-              display: flex;
-              justify-content: center;
-              flex-wrap: wrap;
-              gap: 10px;
-              margin-bottom: 20px;
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 20px;
             }
 
             .tabs button {
-              padding: 10px 20px;
-              cursor: pointer;
-              border: none;
-              background-color: var(--tab-background);
-              color: var(--text-color);
-              border-radius: 5px;
-              transition: background-color 0.3s;
+                padding: 10px 20px;
+                cursor: pointer;
+                border: none;
+                background-color: var(--tab-background);
+                color: var(--text-color);
+                border-radius: 5px;
+                transition: background-color 0.3s;
             }
 
             .tabs button:hover {
@@ -296,7 +304,16 @@
             }
 
             .color-quality-container {
-              margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin: 10px 0;
+                justify-content: center;
+            }
+
+            .color-quality-container label {
+                min-width: 150px;
+                text-align: right;
             }
 
             #curves-canvas {
@@ -377,17 +394,60 @@
               color: var(--text-color);
             }
 
-            @media (max-width: 768px) {
-              .tabs {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-              }
-
-              .tabs button {
+            #compression-form-jpg, #compression-form-png {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
                 width: 100%;
-                margin-bottom: 0;
-              }
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+            .compression-control {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin: 10px 0;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .compression-control label {
+                min-width: 150px;
+                text-align: right;
+            }
+
+            .compression-control input[type="range"] {
+                flex: 1;
+                max-width: 200px;
+            }
+
+            .compression-control input[type="number"] {
+                width: 60px;
+            }
+
+            @media (max-width: 768px) {
+                .theme-switch-wrapper {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                }
+
+                .container {
+                    margin-top: 60px;
+                    padding: 0 10px;
+                }
+
+                .tabs {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 10px;
+                }
+
+                .tabs button {
+                    width: 100%;
+                    margin-bottom: 0;
+                }
             }
 
             #resize .file-input-wrapper {
@@ -409,53 +469,98 @@
             }
 
             input[type="range"] {
-              -webkit-appearance: none;
-              width: 100%;
-              height: 8px;
-              border-radius: 4px;
-              background: var(--slider-track);
-              outline: none;
-              transition: all 0.3s ease;
-            }
+                -webkit-appearance: none; /* Remove default appearance */
+                width: 100%;
+                background: transparent; /* Remove default background */
+                margin: 10px 0;
+              }
 
-            input[type="range"]::-webkit-slider-thumb {
-              -webkit-appearance: none;
-              appearance: none;
-              width: 16px;
-              height: 16px;
-              border-radius: 50%;
-              background: var(--slider-thumb);
-              cursor: pointer;
-              transition: all 0.3s ease;
-            }
+              /* WebKit browsers */
+              input[type="range"]::-webkit-slider-runnable-track {
+                width: 100%;
+                height: 8px;
+                cursor: pointer;
+                background: var(--slider-track-background);
+                border-radius: 5px;
+                border: 1px solid var(--border-color);
+              }
 
-            input[type="range"]::-webkit-slider-thumb:hover {
-              background: var(--hover-color);
-            }
+              input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                height: 20px;
+                width: 20px;
+                border-radius: 50%;
+                background: var(--slider-thumb-background);
+                cursor: pointer;
+                margin-top: -6px; /* Position thumb in the center of track */
+              }
 
-            input[type="range"]::-moz-range-thumb {
-              width: 16px;
-              height: 16px;
-              border: none;
-              border-radius: 50%;
-              background: var(--slider-thumb);
-              cursor: pointer;
-              transition: all 0.3s ease;
-            }
+              /* Firefox */
+              input[type="range"]::-moz-range-track {
+                width: 100%;
+                height: 8px;
+                cursor: pointer;
+                background: var(--slider-track-background);
+                border-radius: 5px;
+                border: 1px solid var(--border-color);
+              }
 
-            input[type="range"]::-moz-range-thumb:hover {
-              background: var(--hover-color);
-            }
+              input[type="range"]::-moz-range-thumb {
+                height: 20px;
+                width: 20px;
+                border-radius: 50%;
+                background: var(--slider-thumb-background);
+                cursor: pointer;
+              }
 
-            input[type="range"]::-moz-range-track {
-              width: 100%;
-              height: 8px;
-              border-radius: 4px;
-              background: var(--slider-track);
-              transition: all 0.3s ease;
-            }
+              /* Internet Explorer */
+              input[type="range"]::-ms-track {
+                width: 100%;
+                height: 8px;
+                cursor: pointer;
+                background: transparent;
+                border-color: transparent;
+                color: transparent;
+              }
+
+              input[type="range"]::-ms-fill-lower {
+                background: var(--slider-track-background);
+                border: 1px solid var(--border-color);
+                border-radius: 5px;
+              }
+
+              input[type="range"]::-ms-fill-upper {
+                background: var(--slider-track-background);
+                border: 1px solid var(--border-color);
+                border-radius: 5px;
+              }
+
+              input[type="range"]::-ms-thumb {
+                height: 20px;
+                width: 20px;
+                border-radius: 50%;
+                background: var(--slider-thumb-background);
+                cursor: pointer;
+                margin-top: 0; /* Position thumb in the center of track */
+              }
+
+              /* Focus styles */
+              input[type="range"]:focus {
+                outline: none;
+              }
+
+              input[type="range"]:focus::-webkit-slider-runnable-track {
+                background: var(--slider-track-background);
+              }
+
+              input[type="range"]:focus::-ms-fill-lower {
+                background: var(--slider-track-background);
+              }
+
+              input[type="range"]:focus::-ms-fill-upper {
+                background: var(--slider-track-background);
+              }
             </style>
-</rewrite_this>
 </rewrite_this>
     </head>
     <body>
@@ -828,7 +933,7 @@
                         </button>
                         <span class="file-input-label">no file chosen</span>
                     </div>
-                    <div>
+                    <div class="compression-control">
                         <label for="jpg-quality"
                             >compression quality (%):</label
                         >
@@ -873,7 +978,7 @@
                         </button>
                         <span class="file-input-label">no file chosen</span>
                     </div>
-                    <div>
+                    <div class="compression-control">
                         <label for="png-resize-factor"
                             >resize factor (%):</label
                         >
@@ -884,7 +989,13 @@
                             max="100"
                             value="70"
                         />
-                        <span id="png-resize-value">70%</span>
+                        <input
+                            type="number"
+                            id="png-resize-input"
+                            min="10"
+                            max="100"
+                            value="70"
+                        />
                     </div>
                     <div class="color-quality-container">
                         <label for="png-color-quality">color quality:</label>
