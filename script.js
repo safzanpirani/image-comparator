@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  /* ================== Tab Navigation ================== */
   const tabLinks = document.querySelectorAll(".tab-link");
   const tabContents = document.querySelectorAll(".tab-content");
 
@@ -53,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fileLabel.textContent =
         files.length > 1 ? `${files.length} files selected` : files[0].name;
     } else {
-      fileLabel.textContent = "No files chosen";
+      fileLabel.textContent = "no files chosen";
     }
   });
   setupDragAndDrop();
@@ -79,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Open the image comparison tab by default
   const defaultTab = document.querySelector('[data-tab="comparison"]');
   if (defaultTab) {
-    openTab({ currentTarget: defaultTab }, "comparison");
+    defaultTab.click();
   }
 
   // Automatically open the first tab
@@ -111,10 +112,34 @@ document.addEventListener("DOMContentLoaded", () => {
           label.textContent = "No file chosen";
         }
       });
+
+      // Drag and Drop
+      wrapper.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        wrapper.classList.add("dragover");
+      });
+
+      wrapper.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        wrapper.classList.remove("dragover");
+      });
+
+      wrapper.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        wrapper.classList.remove("dragover");
+
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+          label.textContent = e.dataTransfer.files[0].name;
+          const changeEvent = new Event("change");
+          fileInput.dispatchEvent(changeEvent);
+        }
+      });
     });
   }
-
-  // Call the setup function
   setupCustomFileInputs();
 
   // PDF Merge functionality
@@ -257,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       } else {
         const page = Number(part) - 1;
-        if (page < pageCount) {
+        if (page < pageCount && page >= 0) {
           ranges.push([page]);
         }
       }
@@ -1268,10 +1293,11 @@ document.addEventListener("DOMContentLoaded", () => {
     drawCurve();
   });
 
+  /* ================== Theme Toggle Logic ================== */
   const checkbox = document.getElementById("checkbox");
   const body = document.body;
 
-  // Check for saved theme preference
+  // Load saved theme preference
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme) {
     body.classList.toggle("light-theme", savedTheme === "light");
@@ -1281,7 +1307,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Handle theme toggle
   checkbox.addEventListener("change", function () {
     body.classList.toggle("light-theme");
-    // Save theme preference
     localStorage.setItem(
       "theme",
       body.classList.contains("light-theme") ? "light" : "dark",
