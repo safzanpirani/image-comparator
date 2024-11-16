@@ -40,6 +40,7 @@
                 <button class="tab-link" data-tab="merge-pdf">merge PDF</button>
                 <button class="tab-link" data-tab="split-pdf">split PDF</button>
                 <button class="tab-link" data-tab="pdf-to-word">pdf to word</button>
+                <button class="tab-link" data-tab="pdf-to-text">pdf to text</button>
                 </div>
 
                 <div id="pdf-to-word" class="tab-content">
@@ -55,6 +56,21 @@
                         </div>
                     </form>
                     <div id="pdf-to-word-result"></div>
+                </div>
+
+                <div id="pdf-to-text" class="tab-content">
+                    <h1>PDF to text converter</h1>
+                    <form id="pdf-to-text-form">
+                        <div class="file-input-wrapper">
+                            <input type="file" id="pdf-file-to-text" accept=".pdf" class="file-input" />
+                            <button type="button" class="file-input-button">choose PDF</button>
+                            <span class="file-input-label">no file chosen</span>
+                        </div>
+                        <div class="button-container">
+                            <button type="button" id="extract-text-btn" class="button">extract text</button>
+                        </div>
+                    </form>
+                    <div id="pdf-to-text-result"></div>
                 </div>
 
             <div id="merge-pdf" class="tab-content">

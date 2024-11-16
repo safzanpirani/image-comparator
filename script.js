@@ -867,7 +867,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const pdfToWordResult = document.getElementById("pdf-to-word-result");
   const pdfFileInput = document.getElementById("pdf-file-to-word");
 
-  // Update file input label when file is selected
+  // PDF to Text conversion logic
+  const pdfToTextForm = document.getElementById("pdf-to-text-form");
+  const extractTextBtn = document.getElementById("extract-text-btn");
+  const pdfToTextResult = document.getElementById("pdf-to-text-result");
+  const pdfFileInputText = document.getElementById("pdf-file-to-text");
+
+  // Update file input label when file is selected for PDF to Word
   pdfFileInput.addEventListener("change", function () {
     const label = this.closest(".file-input-wrapper").querySelector(
       ".file-input-label",
@@ -879,7 +885,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Handle conversion button click
+  // Handle conversion button click for PDF to Word
   convertPdfToWordBtn.addEventListener("click", async () => {
     if (!pdfFileInput.files.length) {
       alert("please select a PDF file");
@@ -936,31 +942,120 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Add drag and drop functionality for PDF files
-  const pdfDropZone = pdfFileInput.closest(".file-input-wrapper");
-
-  pdfDropZone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    pdfDropZone.classList.add("dragover");
+  // Update file input label when file is selected for PDF to Text
+  pdfFileInputText.addEventListener("change", function () {
+    const label = this.closest(".file-input-wrapper").querySelector(
+      ".file-input-label",
+    );
+    if (this.files.length > 0) {
+      label.textContent = this.files[0].name;
+    } else {
+      label.textContent = "no file chosen";
+    }
   });
 
-  pdfDropZone.addEventListener("dragleave", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    pdfDropZone.classList.remove("dragover");
+  // Handle extraction button click for PDF to Text
+  extractTextBtn.addEventListener("click", async () => {
+    if (!pdfFileInputText.files.length) {
+      alert("please select a PDF file");
+      return;
+    }
+
+    const file = pdfFileInputText.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // Show loading message
+    pdfToTextResult.innerHTML = `
+          <p>extracting text from your PDF...</p>
+          <p>this may take a few moments depending on the file size.</p>
+      `;
+
+    try {
+      const response = await fetch("https://api.safzan.tech/extract_text", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "extraction failed");
+      }
+
+      // Get the text from the response
+      const data = await response.json();
+      const text = data.text;
+
+      // Display the extracted text
+      pdfToTextResult.innerHTML = `
+          <p>extraction successful!</p>
+          <textarea readonly>${text}</textarea>
+      `;
+    } catch (error) {
+      pdfToTextResult.innerHTML = `
+              <p style="color: red;">Error: ${error.message}</p>
+              <p>please try again or contact safzan directly. :'(</p>
+          `;
+    }
   });
 
-  pdfDropZone.addEventListener("drop", (e) => {
+  // Add drag and drop functionality for PDF files for PDF to Word
+  const pdfDropZoneWord = pdfFileInput.closest(".file-input-wrapper");
+
+  pdfDropZoneWord.addEventListener("dragover", (e) => {
     e.preventDefault();
     e.stopPropagation();
-    pdfDropZone.classList.remove("dragover");
+    pdfDropZoneWord.classList.add("dragover");
+  });
+
+  pdfDropZoneWord.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pdfDropZoneWord.classList.remove("dragover");
+  });
+
+  pdfDropZoneWord.addEventListener("drop", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pdfDropZoneWord.classList.remove("dragover");
 
     const files = e.dataTransfer.files;
     if (files.length) {
       if (files[0].type === "application/pdf") {
         pdfFileInput.files = files;
-        const label = pdfDropZone.querySelector(".file-input-label");
+        const label = pdfDropZoneWord.querySelector(".file-input-label");
+        label.textContent = files[0].name;
+      } else {
+        alert("please drop a PDF file");
+      }
+    }
+  });
+
+  // Add drag and drop functionality for PDF files for PDF to Text
+  const pdfDropZoneText = pdfFileInputText.closest(".file-input-wrapper");
+
+  pdfDropZoneText.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pdfDropZoneText.classList.add("dragover");
+  });
+
+  pdfDropZoneText.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pdfDropZoneText.classList.remove("dragover");
+  });
+
+  pdfDropZoneText.addEventListener("drop", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pdfDropZoneText.classList.remove("dragover");
+
+    const files = e.dataTransfer.files;
+    if (files.length) {
+      if (files[0].type === "application/pdf") {
+        pdfFileInputText.files = files;
+        const label = pdfDropZoneText.querySelector(".file-input-label");
         label.textContent = files[0].name;
       } else {
         alert("please drop a PDF file");
