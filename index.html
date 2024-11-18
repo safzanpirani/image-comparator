@@ -41,6 +41,34 @@
                 <button class="tab-link" data-tab="split-pdf">split PDF</button>
                 <button class="tab-link" data-tab="pdf-to-word">pdf to word</button>
                 <button class="tab-link" data-tab="pdf-to-text">pdf to text</button>
+                <button class="tab-link" data-tab="chat">chat with groq</button>
+                </div>
+
+                <div id="chat" class="tab-content">
+                    <h1>chat with groq</h1>
+                    <div id="chat-container">
+                        <div id="api-key-container">
+                            <input
+                                type="password"
+                                id="groq-api-key"
+                                placeholder="Enter your GROQ API key"
+                                class="api-key-input"
+                            />
+                            <div class="button-group">
+                                <button id="save-api-key" class="button">save api key</button>
+                                <button id="clear-api-key" class="button">clear saved key</button>
+                            </div>
+                            <div id="api-key-status"></div>
+                            <small class="api-key-note">your API key is securely saved in your browser for convenience.</small>
+                        </div>
+                        <div id="chat-interface" style="display: none;">
+                            <div id="chat-messages"></div>
+                            <form id="chat-form">
+                                <input type="text" id="chat-input" placeholder="Type your message..." />
+                                <button type="submit" class="button">send</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="pdf-to-word" class="tab-content">

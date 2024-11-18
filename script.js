@@ -142,6 +142,164 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   setupCustomFileInputs();
 
+  const chatForm = document.getElementById("chat-form");
+  const chatInput = document.getElementById("chat-input");
+  const chatMessages = document.getElementById("chat-messages");
+  const apiKeyInput = document.getElementById("groq-api-key");
+  const saveApiKeyBtn = document.getElementById("save-api-key");
+  const apiKeyStatus = document.getElementById("api-key-status");
+  const chatInterface = document.getElementById("chat-interface");
+  const clearApiKeyBtn = document.getElementById("clear-api-key");
+
+  let GROQ_API_KEY = "";
+
+  // Check for saved API key in localStorage
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedApiKey = localStorage.getItem("groq_api_key");
+    if (savedApiKey) {
+      GROQ_API_KEY = savedApiKey;
+      apiKeyInput.value = savedApiKey;
+      showApiKeySuccess("using saved API key");
+    }
+  });
+
+  clearApiKeyBtn.addEventListener("click", () => {
+    GROQ_API_KEY = "";
+    apiKeyInput.value = "";
+    localStorage.removeItem("groq_api_key");
+    chatInterface.style.display = "none";
+    apiKeyStatus.textContent = "API key cleared";
+    apiKeyStatus.className = "status-success";
+  });
+
+  // Handle API key saving
+  saveApiKeyBtn.addEventListener("click", () => {
+    const apiKey = apiKeyInput.value.trim();
+    if (apiKey) {
+      // Validate API key format (basic check)
+      if (apiKey.startsWith("gsk_")) {
+        GROQ_API_KEY = apiKey;
+        localStorage.setItem("groq_api_key", apiKey);
+        showApiKeySuccess();
+      } else {
+        showApiKeyError('invalid api key format. should start with "gsk_"');
+      }
+    } else {
+      showApiKeyError("please enter an API key");
+    }
+  });
+
+  function showApiKeySuccess(message = "api key saved successfully!") {
+    apiKeyStatus.textContent = message;
+    apiKeyStatus.className = "status-success";
+    chatInterface.style.display = "block";
+  }
+
+  function showApiKeyError(message) {
+    apiKeyStatus.textContent = message;
+    apiKeyStatus.className = "status-error";
+    chatInterface.style.display = "none";
+  }
+
+  async function sendMessageToGroq(message) {
+    if (!GROQ_API_KEY) {
+      throw new Error("please enter your groq API key first");
+    }
+
+    try {
+      const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${GROQ_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "llama-3.2-90b-text-preview",
+            messages: [
+              {
+                role: "user",
+                content: message,
+              },
+            ],
+            temperature: 0.7,
+            max_tokens: 2048,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error?.message || "Failed to get response from GROQ",
+        );
+      }
+
+      const data = await response.json();
+      return data.choices[0].message.content;
+    } catch (error) {
+      console.error("Error:", error);
+      // If API key is invalid, clear it
+      if (error.message.includes("authentication")) {
+        GROQ_API_KEY = "";
+        localStorage.removeItem("groq_api_key");
+        showApiKeyError("Invalid API key. Please enter a valid key.");
+      }
+      return `Error: ${error.message}`;
+    }
+  }
+
+  function addMessage(message, isUser = false) {
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("message");
+    messageDiv.classList.add(isUser ? "user-message" : "bot-message");
+    messageDiv.textContent = message;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  chatForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    if (!GROQ_API_KEY) {
+      showApiKeyError("Please enter your GROQ API key first");
+      return;
+    }
+
+    // Add user message to chat
+    addMessage(message, true);
+    chatInput.value = "";
+
+    // Show typing indicator
+    const loadingDiv = document.createElement("div");
+    loadingDiv.classList.add("typing-container");
+    loadingDiv.innerHTML = `
+          <div class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+          </div>
+      `;
+    chatMessages.appendChild(loadingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      // Get response from GROQ
+      const response = await sendMessageToGroq(message);
+
+      // Remove typing indicator and add bot response
+      chatMessages.removeChild(loadingDiv);
+      addMessage(response);
+    } catch (error) {
+      // Remove typing indicator and show error
+      chatMessages.removeChild(loadingDiv);
+      addMessage(`Error: ${error.message}`);
+    }
+  });
+
   // PDF Merge functionality
   const mergePdfForm = document.getElementById("merge-pdf-form");
   const mergePdfBtn = document.getElementById("merge-pdf-btn");
