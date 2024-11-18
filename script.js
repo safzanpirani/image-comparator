@@ -1740,6 +1740,14 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Theme toggle checkbox not found!");
     }
 
+    window.checkThemeState = () => {
+      console.log({
+        "localStorage theme": localStorage.getItem("theme"),
+        "Body has light-theme class": body.classList.contains("light-theme"),
+        "Checkbox checked": checkbox?.checked,
+      });
+    };
+
     // Metadata Logic
     const metadataForm = document.getElementById("metadata-form");
     const metadataDisplay = document.getElementById("metadata-display");
