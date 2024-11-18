@@ -155,6 +155,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   setupCustomFileInputs();
 
+  function debugStorage(action, key, value) {
+      console.log(`Storage ${action}:`, { key, value });
+      console.log('Current localStorage state:', localStorage);
+  }
+
+  // Replace the API key handling code with this version
   const chatForm = document.getElementById('chat-form');
   const chatInput = document.getElementById('chat-input');
   const chatMessages = document.getElementById('chat-messages');
@@ -167,18 +173,22 @@ document.addEventListener("DOMContentLoaded", () => {
   let GROQ_API_KEY = '';
   let conversationHistory = [];
 
-  window.addEventListener("load", () => {
-    const savedApiKey = localStorage.getItem("groq_api_key");
-    if (savedApiKey) {
+  // Immediately check for saved API key
+  const savedApiKey = localStorage.getItem('groq_api_key');
+  debugStorage('Initial Load', 'groq_api_key', savedApiKey);
+  if (savedApiKey) {
       GROQ_API_KEY = savedApiKey;
       apiKeyInput.value = savedApiKey;
-      showApiKeySuccess("Using saved API key");
-    }
-  });
+      chatInterface.style.display = 'block';
+      apiKeyStatus.textContent = 'Using saved API key';
+      apiKeyStatus.className = 'status-success';
+  }
 
-  // Handle API key saving
+  // Save API key
   saveApiKeyBtn.addEventListener('click', () => {
       const apiKey = apiKeyInput.value.trim();
+      debugStorage('Before Save', 'groq_api_key', apiKey);
+
       if (!apiKey) {
           showApiKeyError('Please enter an API key');
           return;
@@ -190,26 +200,33 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
+          // Save to localStorage
           localStorage.setItem('groq_api_key', apiKey);
+          debugStorage('After Save', 'groq_api_key', localStorage.getItem('groq_api_key'));
+
+          // Update global variable
           GROQ_API_KEY = apiKey;
-          console.log('Saved API key successfully'); // Debug
+
+          // Show success and enable chat interface
           showApiKeySuccess();
-          loadConversationHistory();
+
       } catch (error) {
           console.error('Error saving API key:', error);
           showApiKeyError('Failed to save API key');
       }
   });
 
+  // Clear API key
   clearApiKeyBtn.addEventListener('click', () => {
       try {
           localStorage.removeItem('groq_api_key');
+          debugStorage('After Clear', 'groq_api_key', null);
+
           GROQ_API_KEY = '';
           apiKeyInput.value = '';
           chatInterface.style.display = 'none';
           apiKeyStatus.textContent = 'API key cleared';
           apiKeyStatus.className = 'status-success';
-          console.log('Cleared API key successfully'); // Debug
       } catch (error) {
           console.error('Error clearing API key:', error);
       }
@@ -226,6 +243,25 @@ document.addEventListener("DOMContentLoaded", () => {
       apiKeyStatus.className = 'status-error';
       chatInterface.style.display = 'none';
   }
+
+  try {
+      const testKey = 'test_storage_' + Date.now();
+      localStorage.setItem(testKey, 'test');
+      const testValue = localStorage.getItem(testKey);
+      localStorage.removeItem(testKey);
+      console.log('localStorage test:', testValue === 'test' ? 'PASSED' : 'FAILED');
+  } catch (error) {
+      console.error('localStorage test FAILED:', error);
+  }
+
+  window.addEventListener('load', () => {
+      console.log('Page loaded. Current state:', {
+          'API Key Set': !!GROQ_API_KEY,
+          'Chat Interface Visible': chatInterface.style.display !== 'none',
+          'Saved API Key Exists': !!localStorage.getItem('groq_api_key'),
+          'Input Value': apiKeyInput.value,
+      });
+  });
 
   async function sendMessageToGroq(message) {
     if (!GROQ_API_KEY) {
