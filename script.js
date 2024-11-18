@@ -142,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   setupCustomFileInputs();
 
+  let GROQ_API_KEY = "";
   const chatForm = document.getElementById("chat-form");
   const chatInput = document.getElementById("chat-input");
   const chatMessages = document.getElementById("chat-messages");
@@ -151,32 +152,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const chatInterface = document.getElementById("chat-interface");
   const clearApiKeyBtn = document.getElementById("clear-api-key");
 
-  let GROQ_API_KEY = "";
-
-  // Check for saved API key in localStorage
-  document.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener("load", () => {
     const savedApiKey = localStorage.getItem("groq_api_key");
     if (savedApiKey) {
       GROQ_API_KEY = savedApiKey;
       apiKeyInput.value = savedApiKey;
-      showApiKeySuccess("using saved API key");
+      showApiKeySuccess("Using saved API key");
     }
-  });
-
-  clearApiKeyBtn.addEventListener("click", () => {
-    GROQ_API_KEY = "";
-    apiKeyInput.value = "";
-    localStorage.removeItem("groq_api_key");
-    chatInterface.style.display = "none";
-    apiKeyStatus.textContent = "API key cleared";
-    apiKeyStatus.className = "status-success";
   });
 
   // Handle API key saving
   saveApiKeyBtn.addEventListener("click", () => {
     const apiKey = apiKeyInput.value.trim();
     if (apiKey) {
-      // Validate API key format (basic check)
       if (apiKey.startsWith("gsk_")) {
         GROQ_API_KEY = apiKey;
         localStorage.setItem("groq_api_key", apiKey);
@@ -187,6 +175,15 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       showApiKeyError("please enter an API key");
     }
+  });
+
+  clearApiKeyBtn.addEventListener("click", () => {
+    GROQ_API_KEY = "";
+    apiKeyInput.value = "";
+    localStorage.removeItem("groq_api_key");
+    chatInterface.style.display = "none";
+    apiKeyStatus.textContent = "API key cleared";
+    apiKeyStatus.className = "status-success";
   });
 
   function showApiKeySuccess(message = "api key saved successfully!") {
@@ -203,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function sendMessageToGroq(message) {
     if (!GROQ_API_KEY) {
-      throw new Error("please enter your groq API key first");
+      throw new Error("please enter your groq API key first.");
     }
 
     try {
