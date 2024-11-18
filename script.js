@@ -181,8 +181,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Save API key
-  function saveApiKey() {
+  function saveApiKey(e) {
+      // Prevent form submission if it's a button click
+      if (e) e.preventDefault();
+
+      console.log('Save API key function called'); // Debug log
+
       const apiKey = apiKeyInput.value.trim();
+      console.log('API key to save:', apiKey); // Debug log
 
       if (!apiKey) {
           apiKeyStatus.textContent = 'Please enter an API key';
@@ -198,32 +204,47 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
       }
 
-      // Save the API key
-      localStorage.setItem('groq_api_key', apiKey);
-      GROQ_API_KEY = apiKey;
+      try {
+          // Save the API key
+          localStorage.setItem('groq_api_key', apiKey);
+          GROQ_API_KEY = apiKey;
 
-      // Update UI
-      apiKeyStatus.textContent = 'API key saved successfully!';
-      apiKeyStatus.className = 'status-success';
-      chatInterface.style.display = 'block';
+          // Update UI
+          apiKeyStatus.textContent = 'API key saved successfully!';
+          apiKeyStatus.className = 'status-success';
+          chatInterface.style.display = 'block';
 
-      console.log('API key saved:', apiKey);
+          console.log('API key saved successfully'); // Debug log
+      } catch (error) {
+          console.error('Error saving API key:', error);
+          apiKeyStatus.textContent = 'Error saving API key';
+          apiKeyStatus.className = 'status-error';
+      }
   }
 
   // Clear API key
-  function clearApiKey() {
-      localStorage.removeItem('groq_api_key');
-      GROQ_API_KEY = '';
-      apiKeyInput.value = '';
-      chatInterface.style.display = 'none';
-      apiKeyStatus.textContent = 'API key cleared';
-      apiKeyStatus.className = 'status-success';
-      console.log('API key cleared');
+  function clearApiKey(e) {
+      if (e) e.preventDefault();
+
+      console.log('Clear API key function called'); // Debug log
+
+      try {
+          localStorage.removeItem('groq_api_key');
+          GROQ_API_KEY = '';
+          apiKeyInput.value = '';
+          chatInterface.style.display = 'none';
+          apiKeyStatus.textContent = 'API key cleared';
+          apiKeyStatus.className = 'status-success';
+          console.log('API key cleared successfully'); // Debug log
+      } catch (error) {
+          console.error('Error clearing API key:', error);
+      }
   }
 
   // Add event listeners
-  saveApiKeyBtn.onclick = saveApiKey;
-  clearApiKeyBtn.onclick = clearApiKey;
+  console.log('Adding event listeners'); // Debug log
+  saveApiKeyBtn.addEventListener('click', saveApiKey);
+  clearApiKeyBtn.addEventListener('click', clearApiKey);
 
   // Also save when Enter is pressed in the input field
   apiKeyInput.addEventListener('keypress', (e) => {
@@ -234,23 +255,23 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Debug helper
-  window.checkApiKeyState = () => {
-      console.log({
+  function checkApiKeyState() {
+      const state = {
           'localStorage API key': localStorage.getItem('groq_api_key'),
           'GROQ_API_KEY variable': GROQ_API_KEY,
           'Input value': apiKeyInput.value,
           'Chat interface visible': chatInterface.style.display !== 'none',
-          'Status message': apiKeyStatus.textContent
-      });
-  };
+          'Status message': apiKeyStatus.textContent,
+          'Save button exists': !!saveApiKeyBtn,
+          'Clear button exists': !!clearApiKeyBtn
+      };
+      console.log('Current State:', state);
+      return state;
+  }
 
-  // Automatically check state after any save/clear operation
-  const originalSetItem = localStorage.setItem;
-  localStorage.setItem = function() {
-      originalSetItem.apply(this, arguments);
-      console.log('localStorage.setItem called with:', arguments);
-      window.checkApiKeyState();
-  };
+  // Check state on page load
+  console.log('Initial state:');
+  checkApiKeyState();
 
   async function sendMessageToGroq(message) {
     if (!GROQ_API_KEY) {
