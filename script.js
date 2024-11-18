@@ -1,4 +1,40 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const checkbox = document.getElementById("checkbox");
+  const body = document.body;
+
+  // Load saved theme preference
+  function initializeTheme() {
+    try {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        body.classList.toggle("light-theme", savedTheme === "light");
+        checkbox.checked = savedTheme === "light";
+      }
+    } catch (error) {
+      console.error("Error loading theme:", error);
+    }
+  }
+
+  // Handle theme toggle
+  function handleThemeToggle() {
+    try {
+      body.classList.toggle("light-theme");
+      localStorage.setItem(
+        "theme",
+        body.classList.contains("light-theme") ? "light" : "dark",
+      );
+    } catch (error) {
+      console.error("Error saving theme:", error);
+    }
+  }
+
+  // Add event listener to checkbox
+  if (checkbox) {
+    checkbox.addEventListener("change", handleThemeToggle);
+    initializeTheme(); // Initialize theme when page loads
+  } else {
+    console.error("Theme toggle checkbox not found!");
+  }
   /* ================== Tab Navigation ================== */
   const tabLinks = document.querySelectorAll(".tab-link");
   const tabContents = document.querySelectorAll(".tab-content");
@@ -1696,57 +1732,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
         drawCurve();
       });
-
-    /* ================== Theme Toggle Logic ================== */
-    const checkbox = document.getElementById("checkbox");
-    const body = document.body;
-
-    // Load saved theme preference
-    function initializeTheme() {
-      try {
-        const savedTheme = localStorage.getItem("theme");
-        console.log("Saved theme:", savedTheme); // Debug log
-        if (savedTheme) {
-          body.classList.toggle("light-theme", savedTheme === "light");
-          checkbox.checked = savedTheme === "light";
-        }
-      } catch (error) {
-        console.error("Error loading theme:", error);
-      }
-    }
-
-    // Handle theme toggle
-    function handleThemeToggle() {
-      try {
-        body.classList.toggle("light-theme");
-        localStorage.setItem(
-          "theme",
-          body.classList.contains("light-theme") ? "light" : "dark",
-        );
-        console.log(
-          "Theme toggled:",
-          body.classList.contains("light-theme") ? "light" : "dark",
-        ); // Debug log
-      } catch (error) {
-        console.error("Error saving theme:", error);
-      }
-    }
-
-    // Add event listener to checkbox
-    if (checkbox) {
-      checkbox.addEventListener("change", handleThemeToggle);
-      initializeTheme(); // Initialize theme when page loads
-    } else {
-      console.error("Theme toggle checkbox not found!");
-    }
-
-    window.checkThemeState = () => {
-      console.log({
-        "localStorage theme": localStorage.getItem("theme"),
-        "Body has light-theme class": body.classList.contains("light-theme"),
-        "Checkbox checked": checkbox?.checked,
-      });
-    };
 
     // Metadata Logic
     const metadataForm = document.getElementById("metadata-form");
