@@ -164,18 +164,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let conversationHistory = [];
 
   // API key elements
-  const apiKeyForm = document.getElementById('api-key-form');
   const apiKeyInput = document.getElementById('groq-api-key');
   const saveApiKeyBtn = document.getElementById('save-api-key');
   const clearApiKeyBtn = document.getElementById('clear-api-key');
   const apiKeyStatus = document.getElementById('api-key-status');
   const chatInterface = document.getElementById('chat-interface');
-
-  // Prevent form submission in multiple ways
-  apiKeyForm.onsubmit = function(e) {
-      e.preventDefault();
-      return false;
-  };
 
   // Load saved API key on page load
   document.addEventListener('DOMContentLoaded', () => {
@@ -189,20 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   });
 
-  // Handle save button click
-  saveApiKeyBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      saveApiKey();
-  });
-
-  // Handle form submission
-  apiKeyForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      saveApiKey();
-      return false;
-  });
-
+  // Save API key function
   function saveApiKey() {
       const apiKey = apiKeyInput.value.trim();
 
@@ -236,9 +216,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   }
 
-  // Handle clear button click
-  clearApiKeyBtn.addEventListener('click', (e) => {
-      e.preventDefault();
+  // Clear API key function
+  function clearApiKey() {
       try {
           localStorage.removeItem('groq_api_key');
           GROQ_API_KEY = '';
@@ -249,15 +228,20 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
           console.error('Error clearing API key:', error);
       }
-  });
+  }
 
-  // Also handle Enter key explicitly
+  // Add event listeners
+  saveApiKeyBtn.addEventListener('click', saveApiKey);
+  clearApiKeyBtn.addEventListener('click', clearApiKey);
+
+  // Handle Enter key in input
   apiKeyInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
           e.preventDefault();
           saveApiKey();
       }
   });
+
 
   async function sendMessageToGroq(message) {
     if (!GROQ_API_KEY) {

@@ -48,7 +48,7 @@
                     <h1>chat with groq</h1>
                     <div id="chat-container">
                         <div id="api-key-container">
-                            <form id="api-key-form" novalidate>
+                            <div class="api-key-wrapper">
                                 <input
                                     type="password"
                                     id="groq-api-key"
@@ -57,10 +57,10 @@
                                     autocomplete="new-password"
                                 />
                                 <div class="button-group">
-                                    <button type="submit" id="save-api-key" class="button">Save API Key</button>
+                                    <button type="button" id="save-api-key" class="button">Save API Key</button>
                                     <button type="button" id="clear-api-key" class="button">Clear Saved Key</button>
                                 </div>
-                            </form>
+                            </div>
                             <div id="api-key-status"></div>
                             <small class="api-key-note">Your API key is securely saved in your browser for convenience.</small>
                         </div>
