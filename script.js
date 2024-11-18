@@ -164,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let conversationHistory = [];
 
   // API key elements
+  const apiKeyForm = document.getElementById('api-key-form');
   const apiKeyInput = document.getElementById('groq-api-key');
   const saveApiKeyBtn = document.getElementById('save-api-key');
   const clearApiKeyBtn = document.getElementById('clear-api-key');
@@ -182,13 +183,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Save API key
   function saveApiKey(e) {
-      // Prevent form submission if it's a button click
       if (e) e.preventDefault();
 
-      console.log('Save API key function called'); // Debug log
+      console.log('Save API key function called');
 
       const apiKey = apiKeyInput.value.trim();
-      console.log('API key to save:', apiKey); // Debug log
+      console.log('API key to save:', apiKey);
 
       if (!apiKey) {
           apiKeyStatus.textContent = 'Please enter an API key';
@@ -205,16 +205,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-          // Save the API key
           localStorage.setItem('groq_api_key', apiKey);
           GROQ_API_KEY = apiKey;
 
-          // Update UI
           apiKeyStatus.textContent = 'API key saved successfully!';
           apiKeyStatus.className = 'status-success';
           chatInterface.style.display = 'block';
 
-          console.log('API key saved successfully'); // Debug log
+          console.log('API key saved successfully');
       } catch (error) {
           console.error('Error saving API key:', error);
           apiKeyStatus.textContent = 'Error saving API key';
@@ -226,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function clearApiKey(e) {
       if (e) e.preventDefault();
 
-      console.log('Clear API key function called'); // Debug log
+      console.log('Clear API key function called');
 
       try {
           localStorage.removeItem('groq_api_key');
@@ -235,24 +233,16 @@ document.addEventListener("DOMContentLoaded", () => {
           chatInterface.style.display = 'none';
           apiKeyStatus.textContent = 'API key cleared';
           apiKeyStatus.className = 'status-success';
-          console.log('API key cleared successfully'); // Debug log
+          console.log('API key cleared successfully');
       } catch (error) {
           console.error('Error clearing API key:', error);
       }
   }
 
   // Add event listeners
-  console.log('Adding event listeners'); // Debug log
-  saveApiKeyBtn.addEventListener('click', saveApiKey);
+  console.log('Adding event listeners');
+  apiKeyForm.addEventListener('submit', saveApiKey);
   clearApiKeyBtn.addEventListener('click', clearApiKey);
-
-  // Also save when Enter is pressed in the input field
-  apiKeyInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-          e.preventDefault();
-          saveApiKey();
-      }
-  });
 
   // Debug helper
   function checkApiKeyState() {
@@ -262,6 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
           'Input value': apiKeyInput.value,
           'Chat interface visible': chatInterface.style.display !== 'none',
           'Status message': apiKeyStatus.textContent,
+          'Form exists': !!apiKeyForm,
           'Save button exists': !!saveApiKeyBtn,
           'Clear button exists': !!clearApiKeyBtn
       };
