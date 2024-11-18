@@ -160,108 +160,97 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log('Current localStorage state:', localStorage);
   }
 
-  // Replace the API key handling code with this version
-  const chatForm = document.getElementById('chat-form');
-  const chatInput = document.getElementById('chat-input');
-  const chatMessages = document.getElementById('chat-messages');
+  let GROQ_API_KEY = '';
+  let conversationHistory = [];
+
+  // API key elements
   const apiKeyInput = document.getElementById('groq-api-key');
   const saveApiKeyBtn = document.getElementById('save-api-key');
   const clearApiKeyBtn = document.getElementById('clear-api-key');
   const apiKeyStatus = document.getElementById('api-key-status');
   const chatInterface = document.getElementById('chat-interface');
 
-  let GROQ_API_KEY = '';
-  let conversationHistory = [];
-
-  // Immediately check for saved API key
-  const savedApiKey = localStorage.getItem('groq_api_key');
-  debugStorage('Initial Load', 'groq_api_key', savedApiKey);
-  if (savedApiKey) {
-      GROQ_API_KEY = savedApiKey;
-      apiKeyInput.value = savedApiKey;
+  // Check for saved API key immediately
+  if (localStorage.getItem('groq_api_key')) {
+      GROQ_API_KEY = localStorage.getItem('groq_api_key');
+      apiKeyInput.value = GROQ_API_KEY;
       chatInterface.style.display = 'block';
       apiKeyStatus.textContent = 'Using saved API key';
       apiKeyStatus.className = 'status-success';
+      console.log('Loaded saved API key');
   }
 
   // Save API key
-  saveApiKeyBtn.addEventListener('click', () => {
+  function saveApiKey() {
       const apiKey = apiKeyInput.value.trim();
-      debugStorage('Before Save', 'groq_api_key', apiKey);
 
       if (!apiKey) {
-          showApiKeyError('Please enter an API key');
+          apiKeyStatus.textContent = 'Please enter an API key';
+          apiKeyStatus.className = 'status-error';
+          chatInterface.style.display = 'none';
           return;
       }
 
       if (!apiKey.startsWith('gsk_')) {
-          showApiKeyError('Invalid API key format. Should start with "gsk_"');
+          apiKeyStatus.textContent = 'Invalid API key format. Should start with "gsk_"';
+          apiKeyStatus.className = 'status-error';
+          chatInterface.style.display = 'none';
           return;
       }
 
-      try {
-          // Save to localStorage
-          localStorage.setItem('groq_api_key', apiKey);
-          debugStorage('After Save', 'groq_api_key', localStorage.getItem('groq_api_key'));
+      // Save the API key
+      localStorage.setItem('groq_api_key', apiKey);
+      GROQ_API_KEY = apiKey;
 
-          // Update global variable
-          GROQ_API_KEY = apiKey;
-
-          // Show success and enable chat interface
-          showApiKeySuccess();
-
-      } catch (error) {
-          console.error('Error saving API key:', error);
-          showApiKeyError('Failed to save API key');
-      }
-  });
-
-  // Clear API key
-  clearApiKeyBtn.addEventListener('click', () => {
-      try {
-          localStorage.removeItem('groq_api_key');
-          debugStorage('After Clear', 'groq_api_key', null);
-
-          GROQ_API_KEY = '';
-          apiKeyInput.value = '';
-          chatInterface.style.display = 'none';
-          apiKeyStatus.textContent = 'API key cleared';
-          apiKeyStatus.className = 'status-success';
-      } catch (error) {
-          console.error('Error clearing API key:', error);
-      }
-  });
-
-  function showApiKeySuccess(message = 'API key saved successfully!') {
-      apiKeyStatus.textContent = message;
+      // Update UI
+      apiKeyStatus.textContent = 'API key saved successfully!';
       apiKeyStatus.className = 'status-success';
       chatInterface.style.display = 'block';
+
+      console.log('API key saved:', apiKey);
   }
 
-  function showApiKeyError(message) {
-      apiKeyStatus.textContent = message;
-      apiKeyStatus.className = 'status-error';
+  // Clear API key
+  function clearApiKey() {
+      localStorage.removeItem('groq_api_key');
+      GROQ_API_KEY = '';
+      apiKeyInput.value = '';
       chatInterface.style.display = 'none';
+      apiKeyStatus.textContent = 'API key cleared';
+      apiKeyStatus.className = 'status-success';
+      console.log('API key cleared');
   }
 
-  try {
-      const testKey = 'test_storage_' + Date.now();
-      localStorage.setItem(testKey, 'test');
-      const testValue = localStorage.getItem(testKey);
-      localStorage.removeItem(testKey);
-      console.log('localStorage test:', testValue === 'test' ? 'PASSED' : 'FAILED');
-  } catch (error) {
-      console.error('localStorage test FAILED:', error);
-  }
+  // Add event listeners
+  saveApiKeyBtn.onclick = saveApiKey;
+  clearApiKeyBtn.onclick = clearApiKey;
 
-  window.addEventListener('load', () => {
-      console.log('Page loaded. Current state:', {
-          'API Key Set': !!GROQ_API_KEY,
-          'Chat Interface Visible': chatInterface.style.display !== 'none',
-          'Saved API Key Exists': !!localStorage.getItem('groq_api_key'),
-          'Input Value': apiKeyInput.value,
-      });
+  // Also save when Enter is pressed in the input field
+  apiKeyInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+          e.preventDefault();
+          saveApiKey();
+      }
   });
+
+  // Debug helper
+  window.checkApiKeyState = () => {
+      console.log({
+          'localStorage API key': localStorage.getItem('groq_api_key'),
+          'GROQ_API_KEY variable': GROQ_API_KEY,
+          'Input value': apiKeyInput.value,
+          'Chat interface visible': chatInterface.style.display !== 'none',
+          'Status message': apiKeyStatus.textContent
+      });
+  };
+
+  // Automatically check state after any save/clear operation
+  const originalSetItem = localStorage.setItem;
+  localStorage.setItem = function() {
+      originalSetItem.apply(this, arguments);
+      console.log('localStorage.setItem called with:', arguments);
+      window.checkApiKeyState();
+  };
 
   async function sendMessageToGroq(message) {
     if (!GROQ_API_KEY) {
