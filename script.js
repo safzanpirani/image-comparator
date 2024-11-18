@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  console.log("Script version:", "0.1.0");
+  console.log("Last updated:", new Date().toISOString());
+
   function isLocalStorageAvailable() {
     try {
       const test = "__storage_test__";
@@ -193,13 +196,13 @@ document.addEventListener("DOMContentLoaded", () => {
       GROQ_API_KEY = savedKey;
       apiKeyInput.value = GROQ_API_KEY;
       chatInterface.style.display = "block";
-      apiKeyStatus.textContent = "Using saved API key";
+      apiKeyStatus.textContent = "using saved API key";
       apiKeyStatus.className = "status-success";
-      console.log("Loaded saved API key");
+      console.log("loaded saved API key");
       loadConversationHistory();
     } else {
       chatInterface.style.display = "none";
-      apiKeyStatus.textContent = "Please enter an API key";
+      apiKeyStatus.textContent = "please enter an API key";
       apiKeyStatus.className = "status-error";
     }
   }
@@ -209,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const apiKey = apiKeyInput.value.trim();
 
     if (!apiKey) {
-      apiKeyStatus.textContent = "Please enter an API key";
+      apiKeyStatus.textContent = "please enter an API key";
       apiKeyStatus.className = "status-error";
       chatInterface.style.display = "none";
       return;
@@ -217,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!apiKey.startsWith("gsk_")) {
       apiKeyStatus.textContent =
-        "Invalid API key format. Should start with 'gsk_'";
+        "invalid API key format. should start with 'gsk_'";
       apiKeyStatus.className = "status-error";
       chatInterface.style.display = "none";
       return;
@@ -235,8 +238,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       console.log("API key saved successfully");
     } catch (error) {
-      console.error("Error saving API key:", error);
-      apiKeyStatus.textContent = "Error saving API key. Please try again.";
+      console.error("error saving API key:", error);
+      apiKeyStatus.textContent = "error saving API key. please try again.";
       apiKeyStatus.className = "status-error";
     }
   }
@@ -253,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("API key cleared");
     } catch (error) {
       console.error("Error clearing API key:", error);
-      apiKeyStatus.textContent = "Error clearing API key. Please try again.";
+      apiKeyStatus.textContent = "error clearing API key. please try again.";
       apiKeyStatus.className = "status-error";
     }
   }
@@ -305,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error?.message || "Failed to get response from GROQ",
+          errorData.error?.message || "failed to get response from GROQ",
         );
       }
 
@@ -324,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (error.message.includes("authentication")) {
         GROQ_API_KEY = "";
         storageType.removeItem("groq_api_key");
-        showApiKeyError("Invalid API key. Please enter a valid key.");
+        showApiKeyError("invalid API key. please enter a valid key.");
       }
       return `Error: ${error.message}`;
     }
@@ -334,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       storageType.setItem("chat_history", JSON.stringify(conversationHistory));
     } catch (error) {
-      console.error("Error saving chat history:", error);
+      console.error("error saving chat history:", error);
     }
   }
 
@@ -348,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     } catch (error) {
-      console.error("Error loading chat history:", error);
+      console.error("error loading chat history:", error);
       conversationHistory = [];
     }
   }
@@ -369,7 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!message) return;
 
       if (!GROQ_API_KEY) {
-        showApiKeyError("Please enter your GROQ API key first");
+        showApiKeyError("please enter your groq API key first");
         return;
       }
 
@@ -423,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const pdfFiles = document.getElementById("pdf-files").files;
 
       if (pdfFiles.length < 2) {
-        alert("Please select at least two PDF files to merge.");
+        alert("please select at least two PDF files to merge.");
         return;
       }
 
@@ -1699,20 +1702,43 @@ document.addEventListener("DOMContentLoaded", () => {
     const body = document.body;
 
     // Load saved theme preference
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      body.classList.toggle("light-theme", savedTheme === "light");
-      checkbox.checked = savedTheme === "light";
+    function initializeTheme() {
+      try {
+        const savedTheme = localStorage.getItem("theme");
+        console.log("Saved theme:", savedTheme); // Debug log
+        if (savedTheme) {
+          body.classList.toggle("light-theme", savedTheme === "light");
+          checkbox.checked = savedTheme === "light";
+        }
+      } catch (error) {
+        console.error("Error loading theme:", error);
+      }
     }
 
     // Handle theme toggle
-    checkbox.addEventListener("change", function () {
-      body.classList.toggle("light-theme");
-      localStorage.setItem(
-        "theme",
-        body.classList.contains("light-theme") ? "light" : "dark",
-      );
-    });
+    function handleThemeToggle() {
+      try {
+        body.classList.toggle("light-theme");
+        localStorage.setItem(
+          "theme",
+          body.classList.contains("light-theme") ? "light" : "dark",
+        );
+        console.log(
+          "Theme toggled:",
+          body.classList.contains("light-theme") ? "light" : "dark",
+        ); // Debug log
+      } catch (error) {
+        console.error("Error saving theme:", error);
+      }
+    }
+
+    // Add event listener to checkbox
+    if (checkbox) {
+      checkbox.addEventListener("change", handleThemeToggle);
+      initializeTheme(); // Initialize theme when page loads
+    } else {
+      console.error("Theme toggle checkbox not found!");
+    }
 
     // Metadata Logic
     const metadataForm = document.getElementById("metadata-form");
