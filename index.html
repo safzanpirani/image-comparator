@@ -48,12 +48,13 @@
                     <h1>chat with groq</h1>
                     <div id="chat-container">
                         <div id="api-key-container">
-                            <form id="api-key-form">
+                            <form id="api-key-form" novalidate>
                                 <input
                                     type="password"
                                     id="groq-api-key"
                                     placeholder="Enter your GROQ API key"
                                     class="api-key-input"
+                                    autocomplete="new-password"
                                 />
                                 <div class="button-group">
                                     <button type="submit" id="save-api-key" class="button">Save API Key</button>
