@@ -20,57 +20,94 @@
         </div>
         <div class="container">
         <div class="container">
-            <div class="tabs">
-                <button class="tab-link" data-tab="compression-jpg">image compression (jpg)</button>
-                <button class="tab-link" data-tab="compression-png">image compression (png)</button>
-                <button class="tab-link" data-tab="comparison">image comparison</button>
-                <button class="tab-link" data-tab="resize">image resize</button>
-                <button class="tab-link" data-tab="crop">image crop</button>
-                <button class="tab-link" data-tab="flip">image flip</button>
-                <button class="tab-link" data-tab="rotate">image rotate</button>
-                <button class="tab-link" data-tab="colouradjust">
-                    image colour adjustment (wip)
-                </button>
-                <button class="tab-link" data-tab="colorcurves">
-                    color curves
-                </button>
-                <button class="tab-link" data-tab="metadata">
-                    image metadata
-                </button>
-                <button class="tab-link" data-tab="merge-pdf">merge PDF</button>
-                <button class="tab-link" data-tab="split-pdf">split PDF</button>
-                <button class="tab-link" data-tab="pdf-to-word">pdf to word</button>
-                <button class="tab-link" data-tab="pdf-to-text">pdf to text</button>
-                <button class="tab-link" data-tab="chat">chat with groq</button>
+        <div class="tabs">
+            <button class="tab-link" data-tab="compression-jpg">image compression (jpg)</button>
+            <button class="tab-link" data-tab="compression-png">image compression (png)</button>
+            <button class="tab-link" data-tab="comparison">image comparison</button>
+            <button class="tab-link" data-tab="resize">image resize</button>
+            <button class="tab-link" data-tab="crop">image crop</button>
+            <button class="tab-link" data-tab="flip">image flip</button>
+            <button class="tab-link" data-tab="rotate">image rotate</button>
+            <button class="tab-link" data-tab="colouradjust">colour adjustment</button>
+            <button class="tab-link" data-tab="colorcurves">color curves</button>
+            <button class="tab-link" data-tab="metadata">image metadata</button>
+            <button class="tab-link" data-tab="merge-pdf">merge PDF</button>
+            <button class="tab-link" data-tab="split-pdf">split PDF</button>
+            <button class="tab-link" data-tab="pdf-to-word">pdf to word</button>
+            <button class="tab-link" data-tab="pdf-to-text">pdf to text</button>
+            <button class="tab-link" data-tab="chat">chat with groq</button>
+            <button class="tab-link" data-tab="general-chat">general chat</button>
+        </div>
+
+        <div id="general-chat" class="tab-content">
+                    <h1>general chat</h1>
+                    <div id="general-api-key-container">
+                        <div>
+                            <input
+                                type="password"
+                                id="general-api-key"
+                                placeholder="enter your API key"
+                                class="api-key-input"
+                                autocomplete="new-password"
+                            />
+                        </div>
+                        <div>
+                            <input
+                                type="text"
+                                id="general-endpoint"
+                                placeholder="enter your endpoint"
+                                class="api-key-input"
+                            />
+                        </div>
+                        <div>
+                            <input
+                                type="text"
+                                id="general-model"
+                                placeholder="enter your model name"
+                                class="api-key-input"
+                            />
+                        </div>
+                        <div class="button-group">
+                            <button type="button" id="save-general-api-key" class="button">save settings</button>
+                            <button type="button" id="clear-general-api-key" class="button">clear saved settings</button>
+                        </div>
+                    </div>
+                    <div id="general-api-key-status"></div>
+                    <small class="api-key-note">your settings are securely saved in your browser for convenience.</small>
+                    <div id="general-chat-interface" style="display: none; flex-direction: column; height: 100%; display: flex;">
+                        <div id="general-chat-messages" style="flex: 1; overflow-y: auto;"></div>
+                        <form id="general-chat-form" style="margin-top: auto;">
+                            <input type="text" id="general-chat-input" placeholder="type your message..." />
+                            <button type="submit" class="button">send</button>
+                        </form>
+                    </div>
                 </div>
 
                 <div id="chat" class="tab-content">
                     <h1>chat with groq</h1>
-                    <div id="chat-container">
-                        <div id="api-key-container">
-                            <div class="api-key-wrapper">
-                                <input
-                                    type="password"
-                                    id="groq-api-key"
-                                    placeholder="enter your groq API key"
-                                    class="api-key-input"
-                                    autocomplete="new-password"
-                                />
-                                <div class="button-group">
-                                    <button type="button" id="save-api-key" class="button">save API key</button>
-                                    <button type="button" id="clear-api-key" class="button">clear saved key</button>
-                                </div>
+                    <div id="api-key-container">
+                        <div class="api-key-wrapper">
+                            <input
+                                type="password"
+                                id="groq-api-key"
+                                placeholder="enter your groq API key"
+                                class="api-key-input"
+                                autocomplete="new-password"
+                            />
+                            <div class="button-group">
+                                <button type="button" id="save-api-key" class="button">save API key</button>
+                                <button type="button" id="clear-api-key" class="button">clear saved key</button>
                             </div>
-                            <div id="api-key-status"></div>
-                            <small class="api-key-note">your API key is securely saved in your browser for convenience.</small>
                         </div>
-                        <div id="chat-interface" style="display: none;">
-                            <div id="chat-messages"></div>
-                            <form id="chat-form">
-                                <input type="text" id="chat-input" placeholder="type your message..." />
-                                <button type="submit" class="button">send</button>
-                            </form>
-                        </div>
+                        <div id="api-key-status"></div>
+                        <small class="api-key-note">your API key is securely saved in your browser for convenience.</small>
+                    </div>
+                    <div id="chat-interface" style="display: none; flex-direction: column; height: 100%; flex: 1; display: flex;">
+                        <div id="chat-messages" style="flex: 1; overflow-y: auto;"></div>
+                        <form id="chat-form" style="margin-top: auto;">
+                            <input type="text" id="chat-input" placeholder="type your message..." />
+                            <button type="submit" class="button">send</button>
+                        </form>
                     </div>
                 </div>
 
