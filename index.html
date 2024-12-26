@@ -37,6 +37,44 @@
             <button class="tab-link" data-tab="pdf-to-text">pdf to text</button>
             <button class="tab-link" data-tab="chat">chat with groq</button>
             <button class="tab-link" data-tab="general-chat">general chat</button>
+            <button class="tab-link" data-tab="instagram-carousel">instagram carousel</button>
+        </div>
+
+        <div id="instagram-carousel" class="tab-content">
+            <h1>instagram carousel creator</h1>
+            <form id="carousel-form">
+                <div class="file-input-wrapper">
+                    <input type="file" id="carousel-images" accept="image/*" multiple class="file-input" />
+                    <button type="button" class="file-input-button">choose images</button>
+                    <span class="file-input-label">no files chosen</span>
+                </div>
+
+                <div class="carousel-options">
+                    <div>
+                        <label for="carousel-ratio">aspect ratio:</label>
+                        <select id="carousel-ratio">
+                            <option value="1:1">1:1 (square)</option>
+                            <option value="4:5">4:5 (portrait)</option>
+                            <option value="16:9">16:9 (landscape)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="carousel-quality">image quality:</label>
+                        <input type="range" id="carousel-quality" min="1" max="100" value="90" />
+                        <span id="quality-value">90%</span>
+                    </div>
+                </div>
+
+                <div class="carousel-preview" id="carousel-preview">
+                    <!-- Preview images will be displayed here -->
+                </div>
+
+                <div class="button-container">
+                    <button type="button" id="create-carousel" class="button">create carousel</button>
+                </div>
+            </form>
+            <div id="carousel-result"></div>
         </div>
 
         <div id="general-chat" class="tab-content">
@@ -625,6 +663,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
         <script src="script.js"></script>
     </body>
 </html>

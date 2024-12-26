@@ -15,6 +15,216 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function initializeCarouselCreator() {
+    const carouselForm = document.getElementById("carousel-form");
+    const carouselImages = document.getElementById("carousel-images");
+    const carouselPreview = document.getElementById("carousel-preview");
+    const createCarouselBtn = document.getElementById("create-carousel");
+    const carouselResult = document.getElementById("carousel-result");
+    const qualitySlider = document.getElementById("carousel-quality");
+    const qualityValue = document.getElementById("quality-value");
+    const aspectRatioSelect = document.getElementById("carousel-ratio");
+
+    let originalImage = null;
+
+    qualitySlider.addEventListener("input", () => {
+      qualityValue.textContent = `${qualitySlider.value}%`;
+    });
+
+    carouselImages.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file || !file.type.startsWith("image/")) {
+        alert("please select an image file");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          originalImage = img;
+          showPreview();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function showPreview() {
+      const previewCanvas = document.createElement("canvas");
+      const ctx = previewCanvas.getContext("2d");
+
+      // Set preview canvas size
+      previewCanvas.width = originalImage.width;
+      previewCanvas.height = originalImage.height;
+
+      // Draw original image
+      ctx.drawImage(originalImage, 0, 0);
+
+      // Calculate number of segments based on image width and selected ratio
+      const ratio = aspectRatioSelect.value;
+      const segmentWidth = getRatioWidth(ratio, originalImage.height);
+      const numberOfSegments = Math.ceil(originalImage.width / segmentWidth);
+
+      // Draw grid lines
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+      ctx.lineWidth = 2;
+
+      for (let i = 1; i < numberOfSegments; i++) {
+        const x = i * segmentWidth;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, originalImage.height);
+        ctx.stroke();
+      }
+
+      carouselPreview.innerHTML = "";
+      carouselPreview.appendChild(previewCanvas);
+    }
+
+    createCarouselBtn.addEventListener("click", async () => {
+      if (!originalImage) {
+        alert("please select an image first");
+        return;
+      }
+
+      const quality = parseInt(qualitySlider.value) / 100;
+      const ratio = aspectRatioSelect.value;
+      const segmentWidth = getRatioWidth(ratio, originalImage.height);
+      const numberOfSegments = Math.ceil(originalImage.width / segmentWidth);
+
+      carouselResult.innerHTML = "<p>Creating carousel segments...</p>";
+
+      try {
+        const segments = [];
+
+        for (let i = 0; i < numberOfSegments; i++) {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+
+          // Set dimensions based on selected ratio
+          const [width, height] = getCarouselDimensions();
+          canvas.width = width;
+          canvas.height = height;
+
+          // Fill with white background
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillRect(0, 0, width, height);
+
+          // Draw segment of original image
+          ctx.drawImage(
+            originalImage,
+            i * segmentWidth, // source x
+            0, // source y
+            segmentWidth, // source width
+            originalImage.height, // source height
+            0, // dest x
+            0, // dest y
+            width, // dest width
+            height, // dest height
+          );
+
+          segments.push(canvas.toDataURL("image/jpeg", quality));
+        }
+
+        // Display results
+        carouselResult.innerHTML = "<h3>Carousel Segments</h3>";
+        segments.forEach((dataUrl, index) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "segment-wrapper";
+
+          const img = document.createElement("img");
+          img.src = dataUrl;
+          img.className = "segment-preview";
+
+          const downloadBtn = document.createElement("a");
+          downloadBtn.href = dataUrl;
+          downloadBtn.download = `carousel-${index + 1}.jpg`;
+          downloadBtn.className = "button";
+          downloadBtn.textContent = `Download Segment ${index + 1}`;
+
+          wrapper.appendChild(img);
+          wrapper.appendChild(downloadBtn);
+          carouselResult.appendChild(wrapper);
+        });
+      } catch (error) {
+        console.error("Error creating segments:", error);
+        carouselResult.innerHTML = `
+                  <p class="error">Error creating carousel segments: ${error.message}</p>
+              `;
+      }
+    });
+
+    function getRatioWidth(ratio, height) {
+      switch (ratio) {
+        case "1:1":
+          return height;
+        case "4:5":
+          return (height * 4) / 5;
+        case "16:9":
+          return (height * 16) / 9;
+        default:
+          return height;
+      }
+    }
+
+    function getCarouselDimensions() {
+      const ratio = aspectRatioSelect.value;
+      switch (ratio) {
+        case "1:1":
+          return [1080, 1080];
+        case "4:5":
+          return [1080, 1350];
+        case "16:9":
+          return [1080, 607];
+        default:
+          return [1080, 1080];
+      }
+    }
+
+    function processImage(src, targetWidth, targetHeight, quality) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+
+        img.onload = () => {
+          try {
+            const canvas = document.createElement("canvas");
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext("2d");
+
+            // Calculate dimensions to maintain aspect ratio
+            const scale = Math.max(
+              targetWidth / img.width,
+              targetHeight / img.height,
+            );
+            const scaledWidth = img.width * scale;
+            const scaledHeight = img.height * scale;
+            const x = (targetWidth - scaledWidth) / 2;
+            const y = (targetHeight - scaledHeight) / 2;
+
+            // Fill background with white
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, targetWidth, targetHeight);
+
+            // Draw image
+            ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+
+            resolve(canvas.toDataURL("image/jpeg", quality));
+          } catch (error) {
+            reject(error);
+          }
+        };
+
+        img.onerror = () => {
+          reject(new Error("Failed to load image"));
+        };
+
+        img.src = src;
+      });
+    }
+  }
+
   // Handle theme toggle
   function handleThemeToggle() {
     try {
@@ -393,6 +603,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize the API keys and settings on page load
   initializeApiKeys();
+  initializeCarouselCreator();
 
   // Add event listeners
   saveGroqApiKeyBtn.addEventListener("click", saveGroqApiKey);
@@ -693,7 +904,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const pdfFile = pdfFileInput.files[0];
 
     if (!pdfFile) {
-      alert("Please select a PDF file to split.");
+      alert("please select a PDF file to split.");
       return;
     }
 
@@ -739,7 +950,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   mergeSplitPdfsBtn.addEventListener("click", async () => {
     if (splitPdfUrls.length < 2) {
-      alert("Please split a PDF into at least two parts before merging.");
+      alert("please split a PDF into at least two parts before merging.");
       return;
     }
 
@@ -810,7 +1021,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const imageFiles = document.getElementById("image-files").files;
 
     if (imageFiles.length < 2) {
-      alert("Please select at least two images to compare.");
+      alert("please select at least two images to compare.");
       return;
     }
 
