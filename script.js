@@ -2,6 +2,79 @@ document.addEventListener("DOMContentLoaded", () => {
   const checkbox = document.getElementById("checkbox");
   const body = document.body;
 
+  document.addEventListener("paste", (e) => {
+    const activeTab = document.querySelector(".tab-content.active");
+    if (!activeTab) return;
+
+    const toolInputMap = {
+      // Image tools
+      "compression-jpg": { id: "image-to-compress-jpg", type: "image" },
+      "compression-png": { id: "image-to-compress-png", type: "image" },
+      comparison: { id: "image-files", type: "image" },
+      resize: { id: "image-to-resize", type: "image" },
+      crop: { id: "image-to-crop", type: "image" },
+      flip: { id: "image-to-flip", type: "image" },
+      rotate: { id: "image-to-rotate", type: "image" },
+      colouradjust: { id: "image-to-adjust", type: "image" },
+      colorcurves: { id: "image-for-curves", type: "image" },
+      metadata: { id: "image-for-metadata", type: "image" },
+      // PDF tools
+      "merge-pdf": { id: "pdf-files", type: "pdf" },
+      "split-pdf": { id: "pdf-to-split", type: "pdf" },
+      "pdf-to-word": { id: "pdf-file-to-word", type: "pdf" },
+      "pdf-to-text": { id: "pdf-file-to-text", type: "pdf" },
+    };
+
+    const toolConfig = toolInputMap[activeTab.id];
+    if (!toolConfig) return;
+
+    const items = e.clipboardData.items;
+    for (const item of items) {
+      const itemType = item.type.toLowerCase();
+
+      // Handle images
+      if (toolConfig.type === "image" && itemType.startsWith("image/")) {
+        handlePastedFile(
+          item.getAsFile(),
+          toolConfig.id,
+          "image pasted from clipboard",
+        );
+        break;
+      }
+
+      // Handle PDFs
+      if (toolConfig.type === "pdf" && itemType === "application/pdf") {
+        handlePastedFile(
+          item.getAsFile(),
+          toolConfig.id,
+          "PDF pasted from clipboard",
+        );
+        break;
+      }
+    }
+  });
+
+  function handlePastedFile(file, inputId, labelText) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+
+    // Create a FileList-like object
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    input.files = dataTransfer.files;
+
+    // Trigger the change event
+    input.dispatchEvent(new Event("change"));
+
+    // Update the file input label
+    const label = input
+      .closest(".file-input-wrapper")
+      ?.querySelector(".file-input-label");
+    if (label) {
+      label.textContent = labelText;
+    }
+  }
+
   // Load saved theme preference
   function initializeTheme() {
     try {
@@ -11,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         checkbox.checked = savedTheme === "light";
       }
     } catch (error) {
-      console.error("Error loading theme:", error);
+      console.error("error loading theme:", error);
     }
   }
 
@@ -680,7 +753,7 @@ document.addEventListener("DOMContentLoaded", () => {
       saveConversationHistory(historyKey);
       return assistantMessage;
     } catch (error) {
-      console.error("Error:", error);
+      console.error("error:", error);
       if (error.message.includes("authentication")) {
         if (type === "groq") {
           GROQ_API_KEY = "";
@@ -702,7 +775,7 @@ document.addEventListener("DOMContentLoaded", () => {
           );
         }
       }
-      return `Error: ${error.message}`;
+      return `error: ${error.message}`;
     }
   }
 
@@ -778,7 +851,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         // Remove typing indicator and show error
         groqChatMessages.removeChild(loadingDiv);
-        addMessage(`Error: ${error.message}`, false, "groq");
+        addMessage(`error: ${error.message}`, false, "groq");
       }
     });
   }
@@ -819,7 +892,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         // Remove typing indicator and show error
         generalChatMessages.removeChild(loadingDiv);
-        addMessage(`Error: ${error.message}`, false, "general");
+        addMessage(`error: ${error.message}`, false, "general");
       }
     });
   }
@@ -1643,7 +1716,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     } catch (error) {
       pdfToWordResult.innerHTML = `
-              <p style="color: red;">Error: ${error.message}</p>
+              <p style="color: red;">error: ${error.message}</p>
               <p>please try again or contact safzan directly. :'(</p>
           `;
     }
@@ -1700,7 +1773,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     } catch (error) {
       pdfToTextResult.innerHTML = `
-              <p style="color: red;">Error: ${error.message}</p>
+              <p style="color: red;">error: ${error.message}</p>
               <p>please try again or contact safzan directly. :'(</p>
           `;
     }
