@@ -2,6 +2,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const checkbox = document.getElementById("checkbox");
   const body = document.body;
 
+  // Helper function to update file input labels - moved to top
+  function updateFileInputLabel(fileInput) {
+    const label = fileInput.closest(".file-input-wrapper")?.querySelector(".file-input-label");
+    if (label) {
+      label.textContent = fileInput.files.length > 0 
+        ? fileInput.files.length > 1 
+          ? `${fileInput.files.length} files selected` 
+          : fileInput.files[0].name 
+        : "no file chosen";
+    }
+  }
+
   document.addEventListener("paste", (e) => {
     const activeTab = document.querySelector(".tab-content.active");
     if (!activeTab) return;
@@ -10,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Image tools
       "compression-jpg": { id: "image-to-compress-jpg", type: "image" },
       "compression-png": { id: "image-to-compress-png", type: "image" },
+      "compression-webp": { id: "image-to-compress-webp", type: "image" },
       comparison: { id: "image-files", type: "image" },
       resize: { id: "image-to-resize", type: "image" },
       crop: { id: "image-to-crop", type: "image" },
@@ -214,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
           downloadBtn.href = dataUrl;
           downloadBtn.download = `carousel-${index + 1}.jpg`;
           downloadBtn.className = "button";
-          downloadBtn.textContent = `Download Segment ${index + 1}`;
+          downloadBtn.textContent = `download segment ${index + 1}`;
 
           wrapper.appendChild(img);
           wrapper.appendChild(downloadBtn);
@@ -1265,6 +1278,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const input = document.getElementById("image-to-compress-jpg");
     if (input.files.length > 0) {
+      compressionResultJPG.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+      
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -1338,6 +1353,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const input = document.getElementById("image-to-compress-png");
     if (input.files.length > 0) {
+      compressionResultPNG.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+      
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -1433,6 +1450,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const percentageInput = document.getElementById("resize-percentage");
 
     if (input.files.length > 0) {
+      resizeResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+      
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -1504,6 +1523,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateFlippedImage() {
     const input = document.getElementById("image-to-flip");
     if (input.files.length > 0) {
+      flipResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+      
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -1584,6 +1605,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateRotatedImage() {
     const input = document.getElementById("image-to-rotate");
     if (input.files.length > 0) {
+      rotateResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+      
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -1873,6 +1896,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const input = document.getElementById("image-to-adjust");
     if (input.files.length > 0) {
+      colorAdjustmentResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+      
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -2096,6 +2121,8 @@ document.addEventListener("DOMContentLoaded", () => {
   applyCurvesBtn.addEventListener("click", () => {
     const input = document.getElementById("image-for-curves");
     if (input.files.length > 0) {
+      curvesResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+      
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -2229,9 +2256,97 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   });
 
-  document.getElementsByTagName("form").forEach((form) => {
+  // Fix the forEach on HTMLCollection
+  Array.from(document.getElementsByTagName("form")).forEach((form) => {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
     });
   });
+
+  // Add WebP compression functionality
+  const webpQualitySlider = document.getElementById("webp-quality-slider");
+  const webpQualityInput = document.getElementById("webp-quality-input");
+  const webpLossless = document.getElementById("webp-lossless");
+  const compressWebpBtn = document.getElementById("compress-webp");
+  const webpResult = document.getElementById("compression-result-webp");
+
+  if (webpQualitySlider && webpQualityInput) {
+    webpQualitySlider.addEventListener("input", () => {
+      webpQualityInput.value = webpQualitySlider.value;
+    });
+
+    webpQualityInput.addEventListener("input", () => {
+      let value = parseInt(webpQualityInput.value);
+      if (value < 1) value = 1;
+      if (value > 100) value = 100;
+      webpQualityInput.value = value;
+      webpQualitySlider.value = value;
+    });
+  }
+
+  if (compressWebpBtn) {
+    compressWebpBtn.addEventListener("click", async () => {
+      const imageInput = document.getElementById("image-to-compress-webp");
+      const file = imageInput.files[0];
+
+      if (!file) {
+        alert("Please select an image first");
+        return;
+      }
+
+      try {
+        webpResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+
+        const img = new Image();
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          img.onload = async () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            try {
+              const quality = parseInt(webpQualityInput.value) / 100;
+              const isLossless = webpLossless.checked;
+
+              const webpBlob = await new Promise((resolve) => {
+                canvas.toBlob(
+                  (blob) => resolve(blob),
+                  "image/webp",
+                  isLossless ? undefined : quality
+                );
+              });
+
+              const originalSize = file.size;
+              const compressedSize = webpBlob.size;
+              const compressionRatio = ((originalSize - compressedSize) / originalSize * 100).toFixed(2);
+
+              const webpUrl = URL.createObjectURL(webpBlob);
+              
+              webpResult.innerHTML = `
+                <div class="download-item">
+                  <img src="${webpUrl}" alt="compressed webp" class="download-preview">
+                  <p>Original size: ${(originalSize / 1024).toFixed(2)} KB</p>
+                  <p>Compressed size: ${(compressedSize / 1024).toFixed(2)} KB</p>
+                  <p>Compression ratio: ${compressionRatio}%</p>
+                  <a href="${webpUrl}" download="compressed.webp" class="button">download webp</a>
+                </div>
+              `;
+            } catch (error) {
+              console.error("Error compressing image:", error);
+              webpResult.innerHTML = `<p class="error">Error compressing image: ${error.message}</p>`;
+            }
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error reading file:", error);
+        webpResult.innerHTML = `<p class="error">Error reading file: ${error.message}</p>`;
+      }
+    });
+  }
 });

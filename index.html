@@ -23,6 +23,7 @@
         <div class="tabs">
             <button class="tab-link" data-tab="compression-jpg">image compression (jpg)</button>
             <button class="tab-link" data-tab="compression-png">image compression (png)</button>
+            <button class="tab-link" data-tab="compression-webp">image compression (webp)</button>
             <button class="tab-link" data-tab="comparison">image comparison</button>
             <button class="tab-link" data-tab="resize">image resize</button>
             <button class="tab-link" data-tab="crop">image crop</button>
@@ -578,6 +579,56 @@
                     </button>
                 </form>
                 <div id="compression-result-png"></div>
+            </div>
+
+            <div id="compression-webp" class="tab-content">
+                <h1>image compression tool (webp)</h1>
+                <form id="compression-form-webp">
+                    <div class="file-input-wrapper">
+                        <input
+                            type="file"
+                            id="image-to-compress-webp"
+                            accept="image/*"
+                            class="file-input"
+                        />
+                        <button type="button" class="file-input-button">
+                            choose image
+                        </button>
+                        <span class="file-input-label">no file chosen</span>
+                    </div>
+                    <div class="compression-control">
+                        <label for="webp-quality">compression quality (%):</label>
+                        <input
+                            type="range"
+                            id="webp-quality-slider"
+                            min="1"
+                            max="100"
+                            value="75"
+                        />
+                        <input
+                            type="number"
+                            id="webp-quality-input"
+                            min="1"
+                            max="100"
+                            value="75"
+                        />
+                    </div>
+                    <div class="compression-control">
+                        <label for="webp-lossless">lossless:</label>
+                        <input
+                            type="checkbox"
+                            id="webp-lossless"
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        id="compress-webp"
+                        class="button button-margin"
+                    >
+                        compress
+                    </button>
+                </form>
+                <div id="compression-result-webp"></div>
             </div>
 
             <div id="resize" class="tab-content">
