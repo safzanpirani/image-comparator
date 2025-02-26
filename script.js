@@ -4,13 +4,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Helper function to update file input labels - moved to top
   function updateFileInputLabel(fileInput) {
-    const label = fileInput.closest(".file-input-wrapper")?.querySelector(".file-input-label");
+    const label = fileInput
+      .closest(".file-input-wrapper")
+      ?.querySelector(".file-input-label");
     if (label) {
-      label.textContent = fileInput.files.length > 0 
-        ? fileInput.files.length > 1 
-          ? `${fileInput.files.length} files selected` 
-          : fileInput.files[0].name 
-        : "no file chosen";
+      label.textContent =
+        fileInput.files.length > 0
+          ? fileInput.files.length > 1
+            ? `${fileInput.files.length} files selected`
+            : fileInput.files[0].name
+          : "no file chosen";
     }
   }
 
@@ -179,7 +182,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const segmentWidth = getRatioWidth(ratio, originalImage.height);
       const numberOfSegments = Math.ceil(originalImage.width / segmentWidth);
 
-      carouselResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Creating carousel segments...</p></div>';
+      carouselResult.innerHTML =
+        '<div class="processing-message"><div class="processing-spinner"></div><p>Creating carousel segments...</p></div>';
 
       try {
         const segments = [];
@@ -949,7 +953,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    mergePdfResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing PDFs...</p></div>';
+    mergePdfResult.innerHTML =
+      '<div class="processing-message"><div class="processing-spinner"></div><p>Processing PDFs...</p></div>';
 
     const mergedPdf = await PDFLib.PDFDocument.create();
 
@@ -996,7 +1001,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    splitPdfResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing PDF...</p></div>';
+    splitPdfResult.innerHTML =
+      '<div class="processing-message"><div class="processing-spinner"></div><p>Processing PDF...</p></div>';
 
     const pdfBytes = await readFileAsArrayBuffer(pdfFile);
     const pdf = await PDFLib.PDFDocument.load(pdfBytes);
@@ -1044,7 +1050,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    splitPdfResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Merging PDF parts...</p></div>';
+    splitPdfResult.innerHTML =
+      '<div class="processing-message"><div class="processing-spinner"></div><p>Merging PDF parts...</p></div>';
 
     const mergedPdf = await PDFLib.PDFDocument.create();
 
@@ -1117,8 +1124,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    imageContainer.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing images...</p></div>';
-    
+    imageContainer.innerHTML =
+      '<div class="processing-message"><div class="processing-spinner"></div><p>Processing images...</p></div>';
+
     Array.from(imageFiles).forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -1231,8 +1239,9 @@ document.addEventListener("DOMContentLoaded", () => {
   cropBtn.addEventListener("click", (e) => {
     e.preventDefault();
     if (cropper) {
-      cropResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
-      
+      cropResult.innerHTML =
+        '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+
       const canvas = cropper.getCroppedCanvas();
       const dataURL = canvas.toDataURL("image/png");
 
@@ -1288,9 +1297,13 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const input = document.getElementById("image-to-compress-jpg");
     if (input.files.length > 0) {
-      compressionResultJPG.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
-      
+      compressionResultJPG.innerHTML =
+        '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+
+      const file = input.files[0];
+      const originalSize = file.size;
       const reader = new FileReader();
+
       reader.onload = () => {
         const img = new Image();
         img.src = reader.result;
@@ -1301,36 +1314,43 @@ document.addEventListener("DOMContentLoaded", () => {
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0, img.width, img.height);
           const quality = parseInt(jpgQualityInput.value) / 100;
-          const dataURL = canvas.toDataURL("image/jpeg", quality);
-          const compressedImg = new Image();
-          compressedImg.src = dataURL;
-          compressedImg.classList.add("image-preview");
-          compressionResultJPG.innerHTML = "";
-          compressionResultJPG.appendChild(compressedImg);
 
-          const a = document.createElement("a");
-          a.href = dataURL;
-          a.download = "compressed-image.jpg";
-          a.className = "button";
-          a.innerText = "download compressed image";
+          // Convert canvas to blob (accurate size measurement)
+          canvas.toBlob(
+            (compressedBlob) => {
+              const compressedSize = compressedBlob.size;
+              const sizeReduction = (
+                ((originalSize - compressedSize) / originalSize) *
+                100
+              ).toFixed(2);
 
-          const buttonContainer = document.createElement("div");
-          buttonContainer.classList.add("button-container");
-          buttonContainer.appendChild(a);
+              // Create URL for display and download
+              const dataURL = URL.createObjectURL(compressedBlob);
 
-          compressionResultJPG.innerHTML = "";
-          compressionResultJPG.appendChild(compressedImg);
-          compressionResultJPG.appendChild(buttonContainer);
+              const compressedImg = new Image();
+              compressedImg.src = dataURL;
+              compressedImg.classList.add("image-preview");
 
-          const originalSize = new Blob([reader.result]).size;
-          const compressedSize = new Blob([dataURL]).size;
-          const compressionRatio = (
-            (1 - compressedSize / originalSize) *
-            100
-          ).toFixed(2);
-          const infoText = document.createElement("p");
-          infoText.textContent = `Original size: ${(originalSize / 1024).toFixed(2)}KB, Compressed size: ${(compressedSize / 1024).toFixed(2)}KB, Compression ratio: ${compressionRatio}%`;
-          compressionResultJPG.appendChild(infoText);
+              const a = document.createElement("a");
+              a.href = dataURL;
+              a.className = "button";
+              a.innerText = "download compressed image";
+
+              const buttonContainer = document.createElement("div");
+              buttonContainer.classList.add("button-container");
+              buttonContainer.appendChild(a);
+
+              compressionResultJPG.innerHTML = "";
+              compressionResultJPG.appendChild(compressedImg);
+              compressionResultJPG.appendChild(buttonContainer);
+
+              const infoText = document.createElement("p");
+              infoText.textContent = `Original size: ${(originalSize / 1024).toFixed(2)}KB, Compressed size: ${(compressedSize / 1024).toFixed(2)}KB, Size reduction: ${sizeReduction}%`;
+              compressionResultJPG.appendChild(infoText);
+            },
+            "image/jpeg",
+            quality,
+          );
         };
       };
       reader.readAsDataURL(input.files[0]);
@@ -1363,8 +1383,9 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const input = document.getElementById("image-to-compress-png");
     if (input.files.length > 0) {
-      compressionResultPNG.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
-      
+      compressionResultPNG.innerHTML =
+        '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -1460,8 +1481,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const percentageInput = document.getElementById("resize-percentage");
 
     if (input.files.length > 0) {
-      resizeResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
-      
+      resizeResult.innerHTML =
+        '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -1533,8 +1555,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateFlippedImage() {
     const input = document.getElementById("image-to-flip");
     if (input.files.length > 0) {
-      flipResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
-      
+      flipResult.innerHTML =
+        '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -1615,8 +1638,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateRotatedImage() {
     const input = document.getElementById("image-to-rotate");
     if (input.files.length > 0) {
-      rotateResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
-      
+      rotateResult.innerHTML =
+        '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -1710,7 +1734,8 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("file", file);
 
     // Show loading message with spinner
-    pdfToWordResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Converting your PDF to Word...</p></div>';
+    pdfToWordResult.innerHTML =
+      '<div class="processing-message"><div class="processing-spinner"></div><p>Converting your PDF to Word...</p></div>';
 
     try {
       const response = await fetch("https://api.safzan.tech/convert", {
@@ -1776,7 +1801,8 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("file", file);
 
     // Show loading message with spinner
-    pdfToTextResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Extracting text from your PDF...</p></div>';
+    pdfToTextResult.innerHTML =
+      '<div class="processing-message"><div class="processing-spinner"></div><p>Extracting text from your PDF...</p></div>';
 
     try {
       const response = await fetch("https://api.safzan.tech/extract_text", {
@@ -1900,8 +1926,9 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const input = document.getElementById("image-to-adjust");
     if (input.files.length > 0) {
-      colorAdjustmentResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
-      
+      colorAdjustmentResult.innerHTML =
+        '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -2125,8 +2152,9 @@ document.addEventListener("DOMContentLoaded", () => {
   applyCurvesBtn.addEventListener("click", () => {
     const input = document.getElementById("image-for-curves");
     if (input.files.length > 0) {
-      curvesResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
-      
+      curvesResult.innerHTML =
+        '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -2211,8 +2239,9 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
-        metadataDisplay.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Extracting metadata...</p></div>';
-        
+        metadataDisplay.innerHTML =
+          '<div class="processing-message"><div class="processing-spinner"></div><p>Extracting metadata...</p></div>';
+
         EXIF.getData(file, function () {
           const allMetadata = EXIF.getAllTags(this);
           displayMetadata(allMetadata);
@@ -2301,7 +2330,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        webpResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+        webpResult.innerHTML =
+          '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
 
         const img = new Image();
         const reader = new FileReader();
@@ -2322,16 +2352,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 canvas.toBlob(
                   (blob) => resolve(blob),
                   "image/webp",
-                  isLossless ? undefined : quality
+                  isLossless ? undefined : quality,
                 );
               });
 
               const originalSize = file.size;
               const compressedSize = webpBlob.size;
-              const compressionRatio = ((originalSize - compressedSize) / originalSize * 100).toFixed(2);
+              const compressionRatio = (
+                ((originalSize - compressedSize) / originalSize) *
+                100
+              ).toFixed(2);
 
               const webpUrl = URL.createObjectURL(webpBlob);
-              
+
               webpResult.innerHTML = `
                 <div class="download-item">
                   <img src="${webpUrl}" alt="compressed webp" class="download-preview">
