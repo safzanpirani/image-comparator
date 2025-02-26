@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const segmentWidth = getRatioWidth(ratio, originalImage.height);
       const numberOfSegments = Math.ceil(originalImage.width / segmentWidth);
 
-      carouselResult.innerHTML = "<p>Creating carousel segments...</p>";
+      carouselResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Creating carousel segments...</p></div>';
 
       try {
         const segments = [];
@@ -949,6 +949,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    mergePdfResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing PDFs...</p></div>';
+
     const mergedPdf = await PDFLib.PDFDocument.create();
 
     for (const pdfFile of pdfFiles) {
@@ -993,6 +995,8 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("please select a PDF file to split.");
       return;
     }
+
+    splitPdfResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing PDF...</p></div>';
 
     const pdfBytes = await readFileAsArrayBuffer(pdfFile);
     const pdf = await PDFLib.PDFDocument.load(pdfBytes);
@@ -1039,6 +1043,8 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("please split a PDF into at least two parts before merging.");
       return;
     }
+
+    splitPdfResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Merging PDF parts...</p></div>';
 
     const mergedPdf = await PDFLib.PDFDocument.create();
 
@@ -1111,6 +1117,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    imageContainer.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing images...</p></div>';
+    
     Array.from(imageFiles).forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -1223,6 +1231,8 @@ document.addEventListener("DOMContentLoaded", () => {
   cropBtn.addEventListener("click", (e) => {
     e.preventDefault();
     if (cropper) {
+      cropResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Processing image...</p></div>';
+      
       const canvas = cropper.getCroppedCanvas();
       const dataURL = canvas.toDataURL("image/png");
 
@@ -1699,11 +1709,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    // Show loading message
-    pdfToWordResult.innerHTML = `
-          <p>converting your PDF to word...</p>
-          <p>this may take a few moments depending on the file size.</p>
-      `;
+    // Show loading message with spinner
+    pdfToWordResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Converting your PDF to Word...</p></div>';
 
     try {
       const response = await fetch("https://api.safzan.tech/convert", {
@@ -1768,11 +1775,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    // Show loading message
-    pdfToTextResult.innerHTML = `
-          <p>extracting text from your PDF...</p>
-          <p>this may take a few moments depending on the file size.</p>
-      `;
+    // Show loading message with spinner
+    pdfToTextResult.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Extracting text from your PDF...</p></div>';
 
     try {
       const response = await fetch("https://api.safzan.tech/extract_text", {
@@ -2207,6 +2211,8 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
+        metadataDisplay.innerHTML = '<div class="processing-message"><div class="processing-spinner"></div><p>Extracting metadata...</p></div>';
+        
         EXIF.getData(file, function () {
           const allMetadata = EXIF.getAllTags(this);
           displayMetadata(allMetadata);
