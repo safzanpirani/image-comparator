@@ -191,15 +191,41 @@ body.light-theme {
     padding: 15px;
     background: var(--card-background);
     border-radius: 5px;
+    position: relative;
 }
 
 .download-preview {
-    max-width: 200px;
-    max-height: 200px;
+    max-width: 400px;
+    max-height: 400px;
     object-fit: contain;
     margin-bottom: 10px;
     border-radius: 5px;
     border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.download-preview:hover {
+    opacity: 0.9;
+}
+
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.image-modal img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 8px;
 }
 
 .error {

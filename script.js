@@ -1327,26 +1327,46 @@ document.addEventListener("DOMContentLoaded", () => {
               // Create URL for display and download
               const dataURL = URL.createObjectURL(compressedBlob);
 
+              // Create download item container
+              const downloadItem = document.createElement("div");
+              downloadItem.className = "download-item";
+
+              // Create and add preview image
               const compressedImg = new Image();
               compressedImg.src = dataURL;
-              compressedImg.classList.add("image-preview");
+              compressedImg.className = "download-preview";
+              compressedImg.alt = "Compressed JPG";
+              compressedImg.addEventListener("click", function() {
+                showFullPreview(dataURL);
+              });
 
-              const a = document.createElement("a");
-              a.href = dataURL;
-              a.className = "button";
-              a.innerText = "download compressed image";
+              // Add info paragraphs
+              const originalSizeP = document.createElement("p");
+              originalSizeP.textContent = `Original size: ${(originalSize / 1024).toFixed(2)} KB`;
+              
+              const compressedSizeP = document.createElement("p");
+              compressedSizeP.textContent = `Compressed size: ${(compressedSize / 1024).toFixed(2)} KB`;
+              
+              const reductionP = document.createElement("p");
+              reductionP.textContent = `Size reduction: ${sizeReduction}%`;
 
-              const buttonContainer = document.createElement("div");
-              buttonContainer.classList.add("button-container");
-              buttonContainer.appendChild(a);
+              // Create download button
+              const downloadBtn = document.createElement("a");
+              downloadBtn.href = dataURL;
+              downloadBtn.download = "compressed-image.jpg";
+              downloadBtn.className = "button";
+              downloadBtn.textContent = "download compressed image";
 
+              // Append all elements to the download item
+              downloadItem.appendChild(compressedImg);
+              downloadItem.appendChild(originalSizeP);
+              downloadItem.appendChild(compressedSizeP);
+              downloadItem.appendChild(reductionP);
+              downloadItem.appendChild(downloadBtn);
+
+              // Clear the result container and add the download item
               compressionResultJPG.innerHTML = "";
-              compressionResultJPG.appendChild(compressedImg);
-              compressionResultJPG.appendChild(buttonContainer);
-
-              const infoText = document.createElement("p");
-              infoText.textContent = `Original size: ${(originalSize / 1024).toFixed(2)}KB, Compressed size: ${(compressedSize / 1024).toFixed(2)}KB, Size reduction: ${sizeReduction}%`;
-              compressionResultJPG.appendChild(infoText);
+              compressionResultJPG.appendChild(downloadItem);
             },
             "image/jpeg",
             quality,
@@ -1408,35 +1428,55 @@ document.addEventListener("DOMContentLoaded", () => {
           ctx.putImageData(imageData, 0, 0);
 
           const dataURL = canvas.toDataURL("image/png");
+          
+          // Create download item container
+          const downloadItem = document.createElement("div");
+          downloadItem.className = "download-item";
+
+          // Create and add preview image
           const compressedImg = new Image();
           compressedImg.src = dataURL;
-          compressedImg.classList.add("image-preview");
-          compressionResultPNG.innerHTML = "";
-          compressionResultPNG.appendChild(compressedImg);
-
-          const a = document.createElement("a");
-          a.href = dataURL;
-          a.download = "compressed-image.png";
-          a.className = "button";
-          a.innerText = "download compressed image";
-
-          const buttonContainer = document.createElement("div");
-          buttonContainer.classList.add("button-container");
-          buttonContainer.appendChild(a);
-
-          compressionResultPNG.innerHTML = "";
-          compressionResultPNG.appendChild(compressedImg);
-          compressionResultPNG.appendChild(buttonContainer);
-
+          compressedImg.className = "download-preview";
+          compressedImg.alt = "Compressed PNG";
+          compressedImg.addEventListener("click", function() {
+            showFullPreview(dataURL);
+          });
+          
+          // Calculate sizes
           const originalSize = new Blob([reader.result]).size;
           const compressedSize = new Blob([dataURL]).size;
           const compressionRatio = (
             (1 - compressedSize / originalSize) *
             100
           ).toFixed(2);
-          const infoText = document.createElement("p");
-          infoText.textContent = `Original size: ${(originalSize / 1024).toFixed(2)}KB, Compressed size: ${(compressedSize / 1024).toFixed(2)}KB, Compression ratio: ${compressionRatio}%`;
-          compressionResultPNG.appendChild(infoText);
+
+          // Add info paragraphs
+          const originalSizeP = document.createElement("p");
+          originalSizeP.textContent = `Original size: ${(originalSize / 1024).toFixed(2)} KB`;
+          
+          const compressedSizeP = document.createElement("p");
+          compressedSizeP.textContent = `Compressed size: ${(compressedSize / 1024).toFixed(2)} KB`;
+          
+          const reductionP = document.createElement("p");
+          reductionP.textContent = `Compression ratio: ${compressionRatio}%`;
+
+          // Create download button
+          const downloadBtn = document.createElement("a");
+          downloadBtn.href = dataURL;
+          downloadBtn.download = "compressed-image.png";
+          downloadBtn.className = "button";
+          downloadBtn.textContent = "download compressed image";
+
+          // Append all elements to the download item
+          downloadItem.appendChild(compressedImg);
+          downloadItem.appendChild(originalSizeP);
+          downloadItem.appendChild(compressedSizeP);
+          downloadItem.appendChild(reductionP);
+          downloadItem.appendChild(downloadBtn);
+
+          // Clear the result container and add the download item
+          compressionResultPNG.innerHTML = "";
+          compressionResultPNG.appendChild(downloadItem);
         };
       };
       reader.readAsDataURL(input.files[0]);
@@ -2365,15 +2405,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
               const webpUrl = URL.createObjectURL(webpBlob);
 
-              webpResult.innerHTML = `
-                <div class="download-item">
-                  <img src="${webpUrl}" alt="compressed webp" class="download-preview">
-                  <p>Original size: ${(originalSize / 1024).toFixed(2)} KB</p>
-                  <p>Compressed size: ${(compressedSize / 1024).toFixed(2)} KB</p>
-                  <p>Compression ratio: ${compressionRatio}%</p>
-                  <a href="${webpUrl}" download="compressed.webp" class="button">download webp</a>
-                </div>
-              `;
+              // Create download item container
+              const downloadItem = document.createElement("div");
+              downloadItem.className = "download-item";
+
+              // Create and add preview image
+              const compressedImg = new Image();
+              compressedImg.src = webpUrl;
+              compressedImg.className = "download-preview";
+              compressedImg.alt = "Compressed WebP";
+              compressedImg.addEventListener("click", function() {
+                showFullPreview(webpUrl);
+              });
+
+              // Add info paragraphs
+              const originalSizeP = document.createElement("p");
+              originalSizeP.textContent = `Original size: ${(originalSize / 1024).toFixed(2)} KB`;
+              
+              const compressedSizeP = document.createElement("p");
+              compressedSizeP.textContent = `Compressed size: ${(compressedSize / 1024).toFixed(2)} KB`;
+              
+              const reductionP = document.createElement("p");
+              reductionP.textContent = `Compression ratio: ${compressionRatio}%`;
+
+              // Create download button
+              const downloadBtn = document.createElement("a");
+              downloadBtn.href = webpUrl;
+              downloadBtn.download = "compressed.webp";
+              downloadBtn.className = "button";
+              downloadBtn.textContent = "download webp";
+
+              // Append all elements to the download item
+              downloadItem.appendChild(compressedImg);
+              downloadItem.appendChild(originalSizeP);
+              downloadItem.appendChild(compressedSizeP);
+              downloadItem.appendChild(reductionP);
+              downloadItem.appendChild(downloadBtn);
+
+              // Clear the result container and add the download item
+              webpResult.innerHTML = "";
+              webpResult.appendChild(downloadItem);
             } catch (error) {
               console.error("Error compressing image:", error);
               webpResult.innerHTML = `<p class="error">Error compressing image: ${error.message}</p>`;
@@ -2386,6 +2457,23 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error reading file:", error);
         webpResult.innerHTML = `<p class="error">Error reading file: ${error.message}</p>`;
       }
+    });
+  }
+
+  // Function to show full-size image preview
+  function showFullPreview(imageUrl) {
+    const modal = document.createElement("div");
+    modal.classList.add("image-modal");
+    modal.innerHTML = `<img src="${imageUrl}" alt="Expanded preview">`;
+    document.body.appendChild(modal);
+    
+    // Prevent scrolling on the body
+    document.body.style.overflow = 'hidden';
+    
+    // Close the modal when clicked
+    modal.addEventListener("click", () => {
+      modal.remove();
+      document.body.style.overflow = 'auto';
     });
   }
 });
